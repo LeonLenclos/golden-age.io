@@ -1,0 +1,305 @@
+html, body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+
+}
+
+*{
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, p{
+  margin: 0;
+  font-size: inherit;
+}
+
+body {
+  font-family: monospace;
+
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  justify-content:flex-end;
+}
+
+.panel{
+  position: relative;
+  width: 280px;
+  margin-bottom: 10px;
+}
+
+#selection{
+  width: 100%;
+  margin-bottom: 0;
+}
+
+#selection > main{
+  height: 125px;
+}
+
+.panelcol-container {
+  margin:-10px;
+  display: flex;
+  flex-direction: row;
+  height: calc(100% + 20px);
+}
+
+
+.panelcol {
+  min-width: 140px;
+  height: 100%;
+  border-right:1px solid white;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.panelcol > main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.panelcol > header {
+  border-bottom: 1px solid white;
+}
+
+.panelcol:last-child{
+  flex-grow: 1;
+  margin-right: 0;
+}
+
+
+button {
+  border:none;
+  padding: 1px 3px;
+  margin:2px;
+}
+
+button[disabled]>*{
+  opacity: .4;
+}
+
+.playername, .entityname{
+  display: inline-block;
+  text-decoration: underline;
+}
+
+#map {
+  overflow: hidden;
+  position: absolute;
+  background: gray;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%
+}
+
+
+#map table {
+ border-collapse: collapse;
+  margin:auto;
+}
+
+#map td {
+  padding:0;
+  border:1px solid gray;
+
+}
+.cell {
+  background:darkgray;
+  width:32px;
+  height: 32px;
+  border-collapse: collapse;
+}
+
+.cell * {
+  position: absolute;
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+.cell.inspected {
+  outline-offset: -1px;
+  outline:1px solid white;
+}
+
+.cell.visible {
+  background: lightgreen
+}
+.selected {
+  filter: drop-shadow(0 0 5px white) drop-shadow(0 0 5px white)  brightness(1.3);
+}
+
+.fullscreen {
+  position: absolute;
+  background:gray;
+  display: flex;
+  flex-direction:column;
+  justify-content: center;
+  align-items: center;
+  z-index:1;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+}
+
+.fullscreen > *{
+  margin:10px;
+}
+
+
+.panel{
+  background: lightgrey;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel > header{
+  display: flex;
+  flex-direction: row;
+  border-bottom:1px solid white;
+  height: 20px;
+}
+
+.panel > header h2, .panelcol > header h2{
+  margin: 0;
+  padding: 0 4px;
+  font-size: inherit;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.panel > header button {
+  width:20px;
+}
+
+.panel > main {
+    padding: 10px;
+  height:160px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.panel#messages main {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel#messages ul {
+  list-style: none;
+  flex-grow: 1;
+  margin: 0;
+  padding: 0;
+ overflow: scroll;
+}
+
+.panel#messages li {
+  margin:4px;
+}
+
+.panel#messages main form {
+  display: flex;
+}
+
+.panel#messages main form input{
+  flex-grow: 1;
+}
+
+
+
+.cards {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow:1;
+
+  margin:10px 0;
+}
+.card{
+    height: 100%;
+
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px;
+  text-align: center;
+  background: #eee;
+
+
+}
+.card:last-child{
+    margin-right: 0;
+}
+.card header{
+  flex-grow:1;
+/*  padding: 10px 0;*/
+    border-bottom: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.card main{
+}
+
+.old-tableee {
+    width: 100%;
+   overflow-wrap: break-word;
+  table-layout: fixed;
+   border-collapse: collapse;
+  margin: 8px auto;
+}
+
+
+.old-tableee col:nth-child(1) {
+  width: 33%;
+}
+
+.old-tableee th{
+  background: white;
+}
+.old-tableee td {
+  padding: 1px 3px;
+}
+.old-tableee td, .card th {
+  border:1px solid white;
+    overflow: hidden;
+}
+
+.fill-bar {
+
+  position: relative;
+  background: darkgray;
+  width: 100%;
+    height: 16px;
+
+
+}
+
+.fill-bar .label {
+    position: relative;
+  text-align: center;
+  text-shadow: 0 0 4px white;
+
+
+}
+.fill-bar .fill {
+  position: absolute;
+  background: white;
+  height: 100%;
+}

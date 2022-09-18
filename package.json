@@ -1,0 +1,15 @@
+{
+  "name": "socket-chat-example",
+  "version": "0.0.1",
+  "description": "my first socket.io app",
+  "type": "module",
+  "dependencies": {
+    "a-star": "^0.2.0",
+    "directory-tree": "^3.3.0",
+    "express": "^4.18.1",
+    "simplex-noise": "^4.0.0",
+    "socket.io": "^4.5.1",
+    "urid": "^1.1.0",
+    "v-hotkey": "^0.9.0"
+  }
+}

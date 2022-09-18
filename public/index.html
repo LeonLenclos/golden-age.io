@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MRTS</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main id="app">
+    <join-room
+      v-if="!room"
+      @join_room="join_room"
+      ></join-room>
+    <main-map
+      ref=map
+      :players="room?.players"
+      :world="room?.world"
+      @inspect=inspect
+      @select=select
+      @target=target
+      ></main-map>
+    <room
+      v-if=room
+      :room=room
+      @quit_room=quit_room
+      ></room>
+    <messages
+      :messages="messages"
+      @send_message="send_message"
+      ></messages>
+    <inspector
+      :pos=inspected_pos
+      :entities="room?.world?.entities.filter(e=>e.pos.x==inspected_pos.x && e.pos.y==inspected_pos.y)"
+      ></inspector>
+    <panel
+      id="selection"
+      title=selection
+      v-if=room
+      >
+      <selection
+        :selection="what_is(selection)"
+        :creations="what_is(selection)?.creations"
+        :mission="what_is(selection)?.mission"
+        @creation=creation
+        ></selection>
+    </panel>
+  </main>
+  <script src="js/lib/vector.js"></script>
+  <script src="js/lib/vue.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/map.js"></script>
+</body>
+</html>
