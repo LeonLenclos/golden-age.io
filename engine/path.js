@@ -25,7 +25,7 @@ export function find_nearest_path(from, to, world){
 export function find_path(from, to, world){
     if(from.equals(to)) return [];
     let neighbor = (v) => v.neighbors().filter(v=>{
-      return world.is_free(v) || v.equals(to);
+      return world.is_free(v) || (v.equals(to) && !world.is_water(v));
     });
     let path = astar({
       start:from,

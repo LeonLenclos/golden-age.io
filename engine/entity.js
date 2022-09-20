@@ -12,6 +12,19 @@ import {
 
 import {find_nearest_path} from './path.js';
 
+
+
+// unused
+function random_stat(min, max, dices){
+  dices = dices || 5;
+    let result = 0;
+    for(let i= 0; i< dices; i++) result += Math.random();
+    return Math.floor((result/dices)*(max-min+1))+min
+}
+
+
+
+
 export class Entity {
 
   static type = 'entity';
@@ -60,6 +73,7 @@ export class Entity {
 
   walk(){
     let action = new Walk(this);
+    this.prev_pos = this.pos.copy();
     if(action.is_possible()){
       action.do();
     }
@@ -98,6 +112,7 @@ export class Entity {
   get_state() {
     return {
       pos:this.pos,
+      prev_pos:this.prev_pos,
       owner:this.owner?.id,
       type:this.constructor.type,
       sprite:this.sprite,
@@ -121,22 +136,26 @@ export class Entity {
 
 export class Gold extends Entity {
   static type = 'gold';
-  static hp = 20;
-  static cost = 5;
+  static hp = 10;
+  static cost = 0;
 
   constructor(pos, owner){
     super(pos)
+    let level = Math.floor(1+Math.random()*5)
+    this.hp_max = this.hp = Gold.hp * level;
+
   }
 }
 
 
 
-function random_stat(min, max, dices){
-  dices = dices || 5;
-    let result = 0;
-    for(let i= 0; i< dices; i++) result += Math.random();
-    return Math.floor((result/dices)*(max-min+1))+min
+export class Water extends Entity {
+  static type = 'water';
+
 }
+
+
+
 
 export class Unit extends Entity {
   static type = 'unit';
@@ -145,7 +164,6 @@ export class Unit extends Entity {
 
   constructor(pos, owner){
     super(pos, owner);
-    this.hp_max = this.hp = Math.max(Unit.hp, random_stat(0,Unit.hp*2));
     this.creations = [House, Factory];
     this.actions = [Create, Defend, Attack, Mine, Repair, Reside];
   }
@@ -154,7 +172,7 @@ export class Unit extends Entity {
     let is_ally = e => e.owner==this.owner
     let some_ally_at = pos => this.world.get_entities_at(pos).some(is_ally)
     let allies = this.pos.neighbors().filter(some_ally_at).length
-    return allies/4;
+    return (allies+1)/5;
   }
 
   get_state() {
@@ -217,7 +235,7 @@ export class Building extends Entity {
 export class House extends Building {
   static type = 'house';
   static hp = 10;
-  static cost = 10;
+  static cost = 50;
 
   constructor(pos, owner){
     super(pos, owner);
@@ -228,8 +246,8 @@ export class House extends Building {
 
 export class Factory extends Building {
   static type = 'factory';
-  static hp = 5;
-  static cost = 5;
+  static hp = 10;
+  static cost = 50;
 
   constructor(pos, owner){
     super(pos, owner);

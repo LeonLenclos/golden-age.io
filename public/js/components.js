@@ -98,7 +98,10 @@ Vue.component('room', {
   props: ['room'],
   template: `
   <panel title="room" id="room">
-    <h2>{{room.name}} ({{room.playing}}, turn {{room.turn}})</h2>
+    <h2>{{room.name}} ({{room.playing}})</h2>
+    <strong v-if="room.players.length<2">Waiting for player...</strong>
+    <strong v-else-if="room.turn<=0">Game starting in {{Math.abs(room.turn)}}</strong>
+    <fill-bar v-else :value="room.turn" :max="room.turn_max"></fill-bar>
     <div class=cards>
       <player-card
         v-for="player in room.players"
@@ -173,11 +176,13 @@ Vue.component('player-card', {
   <div class="card">
     <header>
       <h2><player-name :player=player></player-name></h2>
+      <h2 v-if="player.victory===true">WINNER</h2>
+      <h2 v-if="player.victory===false">LOOSER</h2>
       <span v-if="is_you">(you)</span>
     </header>
     <main>
     <small>gold</small>
-      <fill-bar :value="player.gold" :max="1000"></fill-bar>
+      <fill-bar :value="player.gold" :max="player.gold_max"></fill-bar>
     </main>
   </div>
 
@@ -278,22 +283,47 @@ Vue.component('main-map', {
     return {
       dragging:false,
       drag_from:{x:0,y:0},
-      map_pos:{x:0,y:0}
+      map_pos:{x:0,y:0},
+      entities:[],
+      allies:[],
     };
   },
   props: [
     'players',
     'world',
+    'selection',
   ],
+  watch:{
+    world(new_world, old_world){
+      this.entities = new_world.entities;
+      this.allies = this.entities.filter(e=>e.owner==this.$root.id);
+    }
+  },
   methods:{
     entities_at(pos){
-      return this.world.entities.filter(e=>e.pos.x==pos.x && e.pos.y==pos.y);
+      return this.entities.filter(e=>e.pos.x==pos.x && e.pos.y==pos.y);
+    },
+    allies_at(pos){
+      return this.allies.filter(e=>e.pos.x==pos.x && e.pos.y==pos.y);
+    },
+    is_ally_at(pos){
+      return this.allies.some(e=>e.pos.x==pos.x && e.pos.y==pos.y);
     },
     is_visible(pos){
-      return this.world.entities.some(e=>{
-        return e.owner == this.$root.id && new_vector(pos.x, pos.y).manhattan(new_vector(e.pos.x, e.pos.y)) < 3;
-      });
+      if(this.$root.room.playing=='ended') return true;
+      return this.allies.some(e=>Math.abs(pos.x-e.pos.x)+Math.abs(pos.y-e.pos.y)<4);
+    },
 
+    on_mouse_enter(pos){
+      if(this.is_visible(pos)) this.$emit('inspect', pos);
+    },
+    on_click(pos){
+      if(this.selection && !this.allies_at(pos).some(e=>e.id == this.selection)){
+        this.$emit('target', pos);
+      }
+      if(this.is_ally_at(pos)){
+        this.$emit('select', pos);
+      }
 
     },
     start_drag(event){
@@ -316,6 +346,8 @@ Vue.component('main-map', {
   }
 
   },
+  //          @click.right.prevent="$emit('target', {x,y});"
+
   template: `
   <div
     id="map"
@@ -331,12 +363,12 @@ Vue.component('main-map', {
       <tr v-for="_, y in world.size.y">
         <td
           v-for="_, x in world.size.x"
-          @mouseenter="$emit('inspect', {x,y});"
+          @mouseenter="on_mouse_enter({x,y})"
           @mouseleave="$emit('inspect', {});"
-          @click.left="$emit('select', {x,y});"
-          @click.right.prevent="$emit('target', {x,y});"
+          @click.left="on_click({x,y})"
         >
           <cell
+            :class="{target:selection, select:is_ally_at({x, y})}"
             :visible="is_visible({x,y})"
             :pos="{x,y}"
             :entities="entities_at({x,y})"
@@ -388,10 +420,21 @@ Vue.component('entity-img', {
       }
       return `assets/sprites/${color}/${name}.png`
     },
+    moving_from(x, y){
+      if(!this.entity.prev_pos) return false;
+      return this.entity.prev_pos.x - this.entity.pos.x == x
+          && this.entity.prev_pos.y - this.entity.pos.y == y;
+    }
   },
   template: `
       <img
-        :class={selected:selected}
+        :class="{
+          selected:selected,
+          movingfromleft:moving_from(-1, 0),
+          movingfromright:moving_from(1, 0),
+          movingfromtop:moving_from(0, -1),
+          movingfrombottom:moving_from(0, 1)
+        }"
         :src="get_src()"
       >
       `

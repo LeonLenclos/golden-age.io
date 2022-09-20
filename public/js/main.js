@@ -51,6 +51,7 @@ var app = new Vue({
     target(pos){
       if(!this.selection) return;
       socket.emit('target', this.selection, pos);
+      this.selection = undefined;
     },
     who_is(id){
       return this.room?.players.find(p=>p.id==id);

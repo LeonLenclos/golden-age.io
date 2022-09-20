@@ -1,3 +1,7 @@
+:root {
+  --cell-size : 32px;
+}
+
 html, body {
   padding: 0;
   margin: 0;
@@ -17,7 +21,10 @@ h1, h2, h3, h4, p{
 
 body {
   font-family: monospace;
+}
 
+strong{
+  background: white;
 }
 
 #app {
@@ -115,11 +122,26 @@ button[disabled]>*{
 }
 .cell {
   background:darkgray;
-  width:32px;
-  height: 32px;
+  width:var(--cell-size);
+  height: var(--cell-size);
   border-collapse: collapse;
 }
 
+.cell.select:hover:after,
+.cell.target:hover:after {
+  content:'';
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.cell.select:hover:after{
+    background: url('../assets/gui/select.png');
+}
+
+.cell.target:hover:after{
+      background: url('../assets/gui/target.png');
+}
 .cell * {
   position: absolute;
     user-drag: none;
@@ -129,14 +151,53 @@ button[disabled]>*{
     -webkit-user-select: none;
     -ms-user-select: none;
 }
-.cell.inspected {
-  outline-offset: -1px;
-  outline:1px solid white;
-}
+
 
 .cell.visible {
   background: lightgreen
 }
+
+@keyframes moving {
+  from{
+    top:var(--top-offset);
+    left:var(--left-offset);
+  }
+  to{
+    top:0;
+    left:0;
+  }
+}
+
+.cell .movingfromleft,
+.cell .movingfromright,
+.cell .movingfromtop,
+.cell .movingfrombottom
+ {
+  --top-offset: 0;
+  --left-offset: 0;
+   position: relative;
+   animation-duration: .5s;
+   animation-name: moving;
+   /* animation-timing-function: ease-in; */
+}
+
+.cell .movingfromleft {
+  --left-offset:-32px;
+}
+
+.cell .movingfromright {
+  --left-offset:32px;
+}
+
+.cell .movingfromtop {
+  --top-offset: -32px;
+}
+
+.cell .movingfrombottom{
+  --top-offset: 32px;
+}
+
+
 .selected {
   filter: drop-shadow(0 0 5px white) drop-shadow(0 0 5px white)  brightness(1.3);
 }

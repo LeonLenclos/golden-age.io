@@ -1,4 +1,5 @@
 const DEFAULT_PLAYER_NAME = 'someone';
+const GOLD_MAX = 200;
 
 export let players = [];
 
@@ -21,8 +22,10 @@ export class Player {
     this.name = name || DEFAULT_PLAYER_NAME;
     this.id = id;
     this.gold = 50;
+    this.gold_max = GOLD_MAX;
     this.color = 'white';
     this.room = undefined;
+    this.victory = undefined;
     players.push(this);
   }
 
@@ -35,7 +38,9 @@ export class Player {
       color:this.color,
       name:this.name,
       gold:this.gold,
+      gold_max:this.gold_max,
       id:this.id,
+      victory:this.victory,
     }
   }
 }
