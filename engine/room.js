@@ -87,7 +87,7 @@ export class Room {
           this.set_victory(true, player);
         }
         if(this.turn >= this.turn_max){
-          this.set_victory(players[0].gold > players[1].gold, player[0]);
+          this.set_victory(this.players[0].gold > this.players[1].gold, this.players[0]);
         }
         else if(this.world.entities.filter(e=>e.owner==player).length <= 0){
           this.set_victory(false, player);

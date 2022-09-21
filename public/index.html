@@ -6,8 +6,16 @@
 </head>
 <body>
   <main id="app">
+    <start
+      v-if="!started"
+      @start="started=true"
+      ></start>
+    <loading
+      v-else-if="loading<1"
+      :progress="loading"
+      ></loading>
     <join-room
-      v-if="!room"
+      v-else-if="!room"
       @join_room="join_room"
       ></join-room>
     <main-map
@@ -45,9 +53,10 @@
         ></selection>
     </panel>
   </main>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/lib/howler.js"></script>
   <script src="js/lib/vector.js"></script>
   <script src="js/lib/vue.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
   <script src="js/components.js"></script>
   <script src="js/map.js"></script>
   <script src="js/main.js"></script>

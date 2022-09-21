@@ -220,6 +220,10 @@ button[disabled]>*{
   margin:10px;
 }
 
+#loading .fill-bar {
+  max-width: 500px;
+}
+
 
 .panel{
   background: lightgrey;

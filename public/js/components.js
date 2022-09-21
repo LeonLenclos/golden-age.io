@@ -278,6 +278,28 @@ Vue.component('join-room', {
     `
 });
 
+// entity-img
+Vue.component('loading', {
+
+  props:['progress'],
+
+  template: `
+  <div class="fullscreen" id="loading">
+    <h2>Loading</h2>
+    <fill-bar :value="progress" max=1 :percent="true"></fill-bar>
+  </div>
+    `
+});
+
+Vue.component('start', {
+  template: `
+  <div class="fullscreen" id="loading">
+    <h2>Golden Age</h2>
+    <button @click="$emit('start')">Start</button>
+  </div>
+    `
+});
+
 Vue.component('main-map', {
   data(){
     return {

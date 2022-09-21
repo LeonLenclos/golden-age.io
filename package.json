@@ -10,6 +10,7 @@
     "simplex-noise": "^4.0.0",
     "socket.io": "^4.5.1",
     "urid": "^1.1.0",
-    "v-hotkey": "^0.9.0"
+    "v-hotkey": "^0.9.0",
+    "vuejs": "^3.0.1"
   }
 }
