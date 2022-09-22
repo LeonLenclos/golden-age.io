@@ -1,5 +1,5 @@
 const DEFAULT_PLAYER_NAME = 'someone';
-const GOLD_MAX = 200;
+const GOLD_MAX = 500;
 
 export let players = [];
 

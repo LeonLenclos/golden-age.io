@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MRTS</title>
+  <title>Golden Age</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <main id="app">
+
     <start
-      v-if="!started"
-      @start="started=true"
-      ></start>
+    v-if="!started"
+    @start="started=true"
+    ></start>
     <loading
       v-else-if="loading<1"
       :progress="loading"
@@ -18,7 +19,29 @@
       v-else-if="!room"
       @join_room="join_room"
       ></join-room>
-    <main-map
+
+    <header>
+      <room
+      v-if=room
+      :room=room
+      @quit_room=quit_room
+      ></room>
+    </header>
+
+    <main>
+
+      <aside>
+        <messages
+        :messages="messages"
+        @send_message="send_message"
+        ></messages>
+        <inspector
+        :pos=inspected_pos
+        :entities="room?.world?.entities.filter(e=>e.pos.x==inspected_pos.x && e.pos.y==inspected_pos.y)"
+        ></inspector>
+      </aside>
+
+      <main-map
       ref=map
       :players="room?.players"
       :world="room?.world"
@@ -27,31 +50,37 @@
       @select=select
       @target=target
       ></main-map>
-    <room
-      v-if=room
-      :room=room
-      @quit_room=quit_room
-      ></room>
-    <messages
-      :messages="messages"
-      @send_message="send_message"
-      ></messages>
-    <inspector
-      :pos=inspected_pos
-      :entities="room?.world?.entities.filter(e=>e.pos.x==inspected_pos.x && e.pos.y==inspected_pos.y)"
-      ></inspector>
-    <panel
-      id="selection"
-      title=selection
-      v-if=room
-      >
-      <selection
-        :selection="what_is(selection)"
-        :creations="what_is(selection)?.creations"
-        :mission="what_is(selection)?.mission"
-        @creation=creation
-        ></selection>
-    </panel>
+
+      <aside>
+        <div class="panel"
+        id="selection"
+        v-if=room
+        >
+        <div class="selection-actions">
+          <button
+            @click="unselect()"
+            :disabled="selection==undefined"
+          >unselect <span class="shortcut">space</span></button>
+          <button
+          @click="select_next()"
+          :disabled="selection==undefined"
+        >select next<span class="shortcut">tab</span></button>
+        </div>
+        <selection
+          :selection="what_is(selection)"
+          :creations="what_is(selection)?.creations"
+          :mission="what_is(selection)?.mission"
+          @creation=creation
+          ></selection>
+      </div>
+  
+      </aside>
+
+    </main>
+
+    <footer>
+
+    </footer>
   </main>
   <script src="/socket.io/socket.io.js"></script>
   <script src="js/lib/howler.js"></script>

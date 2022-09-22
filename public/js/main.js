@@ -9,6 +9,7 @@ var app = new Vue({
     started:false,
     id:undefined,
     selection:undefined,
+    selection_index: 0,
     mission_selected:undefined,
     inspected_pos:{},
     messages:[],
@@ -21,8 +22,9 @@ var app = new Vue({
 
     this.load_sound('theme', 0)
 
-    this.$el.addEventListener('keyup', (e)=>{
-      // console.log('KEY', e);
+    document.addEventListener('keyup', (e)=>{
+      console.log('KEEEEY')
+      this.on_keyup(e)
     });
   },
   watch:{
@@ -90,7 +92,14 @@ var app = new Vue({
       let entity = entities.find(e=>e.building) || entities[0]
       this.selection = entity?.id;
     },
-
+    unselect(){
+      this.selection = undefined;
+    },
+    select_next(){
+      let allies = this.room.world.entities.filter(e=>e.owner==this.id);
+      this.selection = allies[this.selection_index%allies.length].id;
+      this.selection_index ++;
+    },
     creation(type){
       if(!this.selection) return;
       socket.emit('creation', this.selection, type);
@@ -108,6 +117,28 @@ var app = new Vue({
       return this.room?.world.entities.find(e=>e.id==id);
     },
     on_keyup(e){
+      let creations = this.what_is(this.selection)?.creations;
+
+      switch (e.key) {
+        case 'a':
+          if(!creations || !creations[0].possible) break;
+          this.creation(creations[0].type)
+        break;
+        case 'z':
+          if(!creations || !creations[1].possible) break;
+          this.creation(creations[1].type)
+        break;
+        case 'Tab':
+          this.select_next();
+          e.preventDefault();
+        break;
+        case ' ':
+          this.unselect();
+          e.preventDefault();
+        break;
+        default:
+          break;
+      }
       console.log(e);
     }
   },

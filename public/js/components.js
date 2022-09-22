@@ -1,27 +1,5 @@
 
-Vue.component('panel', {
-  data:function(){return {
-    rolled_up:false,
-  };},
-  props:['title'],
-  methods:{
-    roll(){
-      this.$emit('send_message', this.input);
-      this.input = '';
-    }
-  },
-  template: `
-  <div class="panel">
-    <header>
-      <h2>{{title}}</h2>
-      <button @click="rolled_up=!rolled_up">{{rolled_up?'-':'+'}}</button>
-    </header>
-    <main v-if="!rolled_up">
-      <slot></slot>
-    </main>
-  </div>
-  `
-});
+
 
 
 Vue.component('messages', {
@@ -44,7 +22,7 @@ Vue.component('messages', {
     }
   },
   template: `
-  <panel title="messages" id="messages">
+  <div class="panel" title="messages" id="messages">
     <ul ref="list">
       <li v-for="message in messages">
         <player-name
@@ -58,7 +36,7 @@ Vue.component('messages', {
       <input v-model="input" name="msg"/>
       <button @click="send">say</button>
     </form>
-  </panel>
+  </div>
   `
 });
 
@@ -97,20 +75,24 @@ Vue.component('entity-name', {
 Vue.component('room', {
   props: ['room'],
   template: `
-  <panel title="room" id="room">
-    <h2>{{room.name}} ({{room.playing}})</h2>
-    <strong v-if="room.players.length<2">Waiting for player...</strong>
-    <strong v-else-if="room.turn<=0">Game starting in {{Math.abs(room.turn)}}</strong>
-    <fill-bar v-else :value="room.turn" :max="room.turn_max"></fill-bar>
-    <div class=cards>
+  <div title="room" id="room">
+    <header>
+      <h2>{{room.name}}</h2>
+      <button @click="$emit('quit_room')">quit</button>
+    </header>
+    <section class="roomstate">
+      <strong v-if="room.players.length<2">Waiting for player...</strong>
+      <strong v-else-if="room.turn<=0">Game starting in {{Math.abs(room.turn)}}</strong>
+      <fill-bar v-else :value="room.turn" :max="room.turn_max"></fill-bar>
+    </section>
+    <section class="players">
       <player-card
         v-for="player in room.players"
         :player="player"
         :is_you="player.id==$root.id"
         ></player-card>
-      </div>
-      <button @click="$emit('quit_room')">quit</button>
-  </panel>
+      </section>
+  </div>
   `
 });
 
@@ -127,7 +109,7 @@ Vue.component('fill-bar', {
     },
     template:`
     <div class="fill-bar">
-      <div class="fill" :style="'width:'+Math.floor(value/max*100)+'%'"></div>
+      <div class="fill" :style="'width:'+(value/max*100).toFixed(2)+'%'"></div>
       <div class="label">{{get_text()}}</div>
     </div>
     `
@@ -173,16 +155,15 @@ Vue.component('player-card', {
   props: ['player', 'is_you'],
   template: `
 
-  <div class="card">
+  <div class="playercard">
     <header>
-      <h2><player-name :player=player></player-name></h2>
+      <h2><player-name :player=player></player-name><span v-if="is_you"> (you)</span></h2>
       <h2 v-if="player.victory===true">WINNER</h2>
       <h2 v-if="player.victory===false">LOOSER</h2>
-      <span v-if="is_you">(you)</span>
+      
     </header>
     <main>
-    <small>gold</small>
-      <fill-bar :value="player.gold" :max="player.gold_max"></fill-bar>
+      <fill-bar class="gold-bar" :value="player.gold" :max="player.gold_max"></fill-bar>
     </main>
   </div>
 
@@ -194,13 +175,13 @@ Vue.component('player-card', {
 Vue.component('inspector', {
   props: ['pos', 'entities'],
   template: `
-  <panel title="inspector" id="inspector">
+  <div class="panel" title="inspector" id="inspector">
     <small v-if="pos.x&&pos.y">inspecting position {{pos.x}},{{pos.y}}</small>
     <small v-else>(move your mouse over the map to inspect)</small>
     <div class=cards>
       <entity-card v-for="entity in entities" :entity=entity></entity-card>
     </div>
-  </panel>
+  </div>
   `
 });
 
@@ -228,7 +209,7 @@ Vue.component('selection', {
     }
   },
   template: `
-  <div class="panelcol-container">
+  <div>
     <panel-col title="selected entity">
         <entity-card v-if="selection" :entity="selection"></entity-card>
     </panel-col>
@@ -236,12 +217,13 @@ Vue.component('selection', {
     <panel-col title="creations">
       <div class="creations">
       <button
-        v-for="crea in creations"
+        v-for="(crea, i) in creations"
         :disabled="!crea.possible"
         @click="$emit('creation', crea.type)"
         >
           <entity-img :entity=crea></entity-img>
-          {{crea.cost}}
+          <div class="gold-value">{{crea.cost}}</div>
+          <span class="shortcut">{{['A or Q', 'Z or W'][i]}}</span>
         </button>
 
       </div>
@@ -293,7 +275,7 @@ Vue.component('loading', {
 
 Vue.component('start', {
   template: `
-  <div class="fullscreen" id="loading">
+  <div class="fullscreen" id="start">
     <h2>Golden Age</h2>
     <button @click="$emit('start')">Start</button>
   </div>
@@ -306,8 +288,10 @@ Vue.component('main-map', {
       dragging:false,
       drag_from:{x:0,y:0},
       map_pos:{x:0,y:0},
+      hover_pos:undefined,
       entities:[],
       allies:[],
+
     };
   },
   props: [
@@ -322,6 +306,9 @@ Vue.component('main-map', {
     }
   },
   methods:{
+    get_selected(){
+      return this.entities.find(e=>e.id==this.selection)
+    },
     entities_at(pos){
       return this.entities.filter(e=>e.pos.x==pos.x && e.pos.y==pos.y);
     },
@@ -337,13 +324,23 @@ Vue.component('main-map', {
     },
 
     on_mouse_enter(pos){
+      this.hover_pos = pos
       if(this.is_visible(pos)) this.$emit('inspect', pos);
     },
+    on_mouse_leave(){
+      this.hover_pos = undefined;
+      this.$emit('inspect', {});
+    },
+    is_targetable(pos){
+      return pos && this.selection
+      && !this.allies_at(pos).some(e=>e.id == this.selection)
+      && !this.get_selected().building;
+    },
     on_click(pos){
-      if(this.selection && !this.allies_at(pos).some(e=>e.id == this.selection)){
+      if(this.is_targetable(pos)){
         this.$emit('target', pos);
       }
-      if(this.is_ally_at(pos)){
+      else if(this.is_ally_at(pos)){
         this.$emit('select', pos);
       }
 
@@ -368,7 +365,6 @@ Vue.component('main-map', {
   }
 
   },
-  //          @click.right.prevent="$emit('target', {x,y});"
 
   template: `
   <div
@@ -378,15 +374,15 @@ Vue.component('main-map', {
     @mouseup="stop_drag"
     @mousemove="drag"
     >
+
     <table
       v-if="world"
-      :style="'position:relative;top:'+map_pos.y+'px;left:'+map_pos.x+'px'"
     >
       <tr v-for="_, y in world.size.y">
         <td
           v-for="_, x in world.size.x"
           @mouseenter="on_mouse_enter({x,y})"
-          @mouseleave="$emit('inspect', {});"
+          @mouseleave="on_mouse_leave()"
           @click.left="on_click({x,y})"
         >
           <cell
@@ -398,26 +394,56 @@ Vue.component('main-map', {
         </td>
       </tr>
     </table>
+
+    <arrow
+    v-if="is_targetable(hover_pos)"
+    :start="get_selected().pos"
+    :end="hover_pos"
+    :size="world.size"
+
+  ></arrow>
   </div>
   `
 });
 
 
-Vue.component('arrow',{
-
+Vue.component('arrow', {
+  data(){
+    return{
+      cell_size:33,
+    };
+  },
+  props:['start', 'end', 'size'],
+  methods:{
+    get_width(){return this.cell_size*(this.size.x+1)},
+    get_height(){return this.cell_size*(this.size.y+1)},
+    get_view_box(){
+      return `0 0 ${this.get_width()} ${this.get_height()}`;
+    }
+  },
   template:`
-<svg xmlns="http://www.w3.org/2000/svg" width=300 height=300 viewBox="0 0 300 300">
-<defs>
-    <marker id="arrow-head" viewBox="0 0 20 20" refX="10" refY="10" markerWidth="10" markerHeight="10" shape-rendering="crispEdges" orient="auto-start-reverse" fill="white">
-      <path d="M 0 0 L 20 10 L 0 20 z" />
-    </marker>
-</defs>
-<line
-  id='arrow-line'
-  marker-end='url(#arrow-head)'
-  stroke-width='1'
-  fill='none' stroke='white'
-  x1="0" y1="0" x2="50" y2="100"   />
+<svg
+  class="arrow"
+  xmlns="http://www.w3.org/2000/svg"
+  :viewBox="get_view_box()"
+  :width="get_width()"
+  :height="get_height()"
+  >
+  <defs>
+      <marker id="arrow-head" viewBox="0 0 20 20" refX="10" refY="10" markerWidth="10" markerHeight="10" shape-rendering="crispEdges" orient="auto-start-reverse" fill="white">
+        <path d="M 0 0 L 20 10 L 0 20 z" />
+      </marker>
+  </defs>
+  <line
+    id='arrow-line'
+    marker-end='url(#arrow-head)'
+    stroke-width='1'
+    fill='none' stroke='white'
+    :x1="cell_size*(start.x+.5)"
+    :y1="cell_size*(start.y+.5)"
+    :x2="cell_size*(end.x+.5)"
+    :y2="cell_size*(end.y+.5)"
+  ></line>
 </svg>
 `
 });

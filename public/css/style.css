@@ -21,6 +21,10 @@ h1, h2, h3, h4, p{
 
 body {
   font-family: monospace;
+  background: #222; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 strong{
@@ -28,60 +32,45 @@ strong{
 }
 
 #app {
-  width: 100%;
-  height: 100%;
+  width: 1130px;
+  height: 700px;
   display: flex;
   flex-direction: column;
-  padding: 10px;
-  justify-content:flex-end;
+    align-items:stretch;
+  /*! justify-content: space-between; */
+
+}
+
+
+#app>main{
+  display: flex;
+  flex-direction: row;
+  align-items:stretch;
+    justify-content: center;
+
+}
+
+#app>main>aside{
+  display: flex;
+  flex-direction: column;
+  width: 230px;
+}
+
+#app>main>aside>:last-child{
+  flex-grow: 1;
 }
 
 .panel{
-  position: relative;
-  width: 280px;
-  margin-bottom: 10px;
 }
 
 #selection{
-  width: 100%;
-  margin-bottom: 0;
 }
 
 #selection > main{
-  height: 125px;
-}
-
-.panelcol-container {
-  margin:-10px;
-  display: flex;
-  flex-direction: row;
-  height: calc(100% + 20px);
 }
 
 
-.panelcol {
-  min-width: 140px;
-  height: 100%;
-  border-right:1px solid white;
-  display: flex;
-  flex-direction: column;
 
-}
-
-.panelcol > main {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.panelcol > header {
-  border-bottom: 1px solid white;
-}
-
-.panelcol:last-child{
-  flex-grow: 1;
-  margin-right: 0;
-}
 
 
 button {
@@ -100,19 +89,24 @@ button[disabled]>*{
 }
 
 #map {
+ position: relative;
   overflow: hidden;
-  position: absolute;
   background: gray;
+  border-radius: 5px;
+  margin:2px;
+}
+
+#map .arrow{
+  position: absolute;
   top:0;
   left:0;
-  width: 100%;
-  height: 100%
+  pointer-events:none;
 }
 
 
 #map table {
  border-collapse: collapse;
-  margin:auto;
+ margin:auto;
 }
 
 #map td {
@@ -140,7 +134,7 @@ button[disabled]>*{
 }
 
 .cell.target:hover:after{
-      background: url('../assets/gui/target.png');
+  /*    background: url('../assets/gui/target.png');*/
 }
 .cell * {
   position: absolute;
@@ -220,6 +214,12 @@ button[disabled]>*{
   margin:10px;
 }
 
+.fullscreen button {
+  height: 50px;
+  width: 300px;
+  border-radius: 3px;
+
+}
 #loading .fill-bar {
   max-width: 500px;
 }
@@ -229,6 +229,12 @@ button[disabled]>*{
   background: lightgrey;
   display: flex;
   flex-direction: column;
+  
+    padding: 3px;
+
+  border-radius: 5px;
+  margin:2px;
+
 }
 
 .panel > header{
@@ -257,6 +263,9 @@ button[disabled]>*{
   flex-direction: column;
 }
 
+.panel#messages {
+    height: 40%;
+}
 
 .panel#messages main {
   display: flex;
@@ -275,20 +284,35 @@ button[disabled]>*{
   margin:4px;
 }
 
-.panel#messages main form {
+.panel#messages form {
   display: flex;
+  flex-wrap: nowrap;
+    min-height:24px;
+  margin:0;
+  border:1px solid #888;
+  border-radius:4px;
+    overflow:hidden;
 }
 
-.panel#messages main form input{
+.panel#messages form * {
+  border:none;
+  margin:0;
+  padding: 0 4px;
+}
+
+.panel#messages form input{
   flex-grow: 1;
+    border-right:1px solid #888;
+
 }
 
 
 
 .cards {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   flex-grow:1;
 
   margin:10px 0;
@@ -322,6 +346,10 @@ button[disabled]>*{
 .card main{
 }
 
+.playercard{
+  
+}
+
 .old-tableee {
     width: 100%;
    overflow-wrap: break-word;
@@ -331,35 +359,23 @@ button[disabled]>*{
 }
 
 
-.old-tableee col:nth-child(1) {
-  width: 33%;
-}
-
-.old-tableee th{
-  background: white;
-}
-.old-tableee td {
-  padding: 1px 3px;
-}
-.old-tableee td, .card th {
-  border:1px solid white;
-    overflow: hidden;
-}
 
 .fill-bar {
 
   position: relative;
-  background: darkgray;
+  background: #888;
   width: 100%;
-    height: 16px;
-
+    height: 24px;
+    border-radius: 4px;
+  overflow: hidden;
+  border:1px solid #888;
 
 }
 
 .fill-bar .label {
-    position: relative;
+  position: relative;
+  line-height: 24px;
   text-align: center;
-  text-shadow: 0 0 4px white;
 
 
 }
@@ -367,4 +383,125 @@ button[disabled]>*{
   position: absolute;
   background: white;
   height: 100%;
+  
+}
+
+.gold-bar .fill {
+  background: #ffd080;
+    border-radius: 2px;
+
+  
+}
+
+#room {
+  display: flex;
+  flex-direction: column;
+}
+
+#room header{
+  background: lightgray;
+  display: flex;
+      border-radius: 5px;
+  align-items: center;
+  margin:2px;
+
+}
+
+#room header h2{
+  flex-grow: 1;
+  margin: 0 5px
+}
+
+.roomstate {
+    background: lightgray;
+  display: flex;
+      border-radius: 5px;
+  margin:2px;
+  text-align: center;
+      height: 24px;
+  align-items: center;
+}
+
+.roomstate strong {
+  font-size: larger;
+    margin:auto;
+  padding: 0 20px;
+  width: 100%;
+  margin: 3px;
+  border-radius:3px;
+}
+
+section.players{
+  display: flex;
+  justify-content: stretch;
+}
+.playercard {
+  padding: 3px;
+  background: #ddd;
+  width: 50%;
+  border-radius: 5px;
+  margin:2px;
+}
+
+.playercard main {  
+
+}
+.playercard header {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.creations {
+  display: flex;
+  flex-direction: column;
+}
+.creations button{
+  border-radius:4px;
+  height:100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  margin:5px;
+}
+
+.creations button img {
+  image-rendering: pixelated;
+  width: 32px;
+  height:32px;
+}
+
+.gold-value {
+  font-weight:bold;
+  display: block;
+}
+
+.gold-value:before{
+  display: inline-block;
+  content: '';
+  margin:0 5px;
+  width:12px;
+  height: 12px;
+ background: url('../assets/gui/coin.png');
+ background-repeat: no-repeat;
+
+}
+
+.selection-actions{
+  display: flex;
+  flex-direction: column;
+  
+}
+.shortcut{
+  display: block;
+  margin: auto;
+  width:40px;
+  color:#333;
+  background: lightgray;
+   margin:2px auto;
+  border-radius:5px;
+  font-size: smaller;
+  border: 1px solid;
+  
+  
 }
