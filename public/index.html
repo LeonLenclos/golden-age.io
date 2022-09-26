@@ -63,7 +63,6 @@
           >unselect <span class="shortcut">space</span></button>
           <button
           @click="select_next()"
-          :disabled="selection==undefined"
         >select next<span class="shortcut">tab</span></button>
         </div>
         <selection
@@ -85,6 +84,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="js/lib/howler.js"></script>
   <script src="js/lib/vector.js"></script>
+  <script src="js/lib/cookies.js"></script>
   <script src="js/lib/vue.js"></script>
   <script src="js/components.js"></script>
   <script src="js/map.js"></script>

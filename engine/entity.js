@@ -106,7 +106,7 @@ export class Entity {
   }
 
   can_create(constructor){
-    return constructor.cost <= this.owner.gold;
+    return !this.under_construction && constructor.cost <= this.owner.gold;
   }
 
   get_state() {
@@ -235,7 +235,7 @@ export class Building extends Entity {
 export class House extends Building {
   static type = 'house';
   static hp = 10;
-  static cost = 50;
+  static cost = 20;
 
   constructor(pos, owner){
     super(pos, owner);
@@ -247,7 +247,7 @@ export class House extends Building {
 export class Factory extends Building {
   static type = 'factory';
   static hp = 10;
-  static cost = 50;
+  static cost = 20;
 
   constructor(pos, owner){
     super(pos, owner);

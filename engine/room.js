@@ -85,14 +85,19 @@ export class Room {
       this.players.forEach(player => {
         if(player.gold >= player.gold_max){
           this.set_victory(true, player);
+          return;
         }
         if(this.turn >= this.turn_max){
           this.set_victory(this.players[0].gold > this.players[1].gold, this.players[0]);
+          return;
         }
-        else if(this.world.entities.filter(e=>e.owner==player).length <= 0){
+        let unit_allies = this.world.entities.filter(e=>e.owner==player && e instanceof Unit)
+        if(unit_allies.length <= 0){
           this.set_victory(false, player);
+          return;
         }
       });
+      
       this.emit('turn', this.get_state());
     }
     else if(this.playing == NOT_STARTED){

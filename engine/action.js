@@ -207,7 +207,17 @@ export class Create extends Action {
   get_pos(){
     if(this.entity instanceof Building) {
       let neighbors = this.entity.pos.neighbors();
-      return neighbors.find(p=>this.entity.world.is_free(p));
+      return neighbors.find(p=>{
+        let entities = this.entity.world.get_entities_at(p)
+        if(!entities.length) return true;
+        if(this.entity.creation instanceof Gold){
+          return entities.length == 1 && entities[0] instanceof Unit;
+        }
+        if(this.entity.creation instanceof Unit){
+          let some_ally = entities.some(e=>e.owner == this.entity.owner && e instanceof Unit);
+          return !this.entity.world.is_water(p) && !some_ally;
+        }
+      });
     }
     if(this.entity instanceof Unit) {
       return this.entity.pos.copy();
@@ -237,6 +247,8 @@ export class Create extends Action {
       this.spawn_creaion();
       return;
     }
+
+    if(!this.entity.get_resident()) return;
 
     if(this.entity.creation.under_construction){
       this.entity.creation.hp ++;

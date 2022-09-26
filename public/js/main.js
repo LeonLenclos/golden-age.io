@@ -23,21 +23,30 @@ var app = new Vue({
     this.load_sound('theme', 0)
 
     document.addEventListener('keyup', (e)=>{
-      console.log('KEEEEY')
-      this.on_keyup(e)
+      return this.on_keyup(e)
     });
   },
   watch:{
     room(new_room, old_room){
-      if(old_room && new_room.turn != old_room.turn){
+      if(!new_room || !old_room) return;
+      if(new_room.turn != old_room.turn){
         this.play_sound('theme', 0);
       }
+      if(new_room.playing =! old_room.playing
+        && new_room.playing == 'ended'){
+        this.stop_sound('theme', 0);
+
+        }
     }
   },
   methods: {
     play_sound(name, variation){
       if(this.sounds[name][variation].sound.playing()) return;
       this.sounds[name][variation].sound.play();
+    },
+    stop_sound(name, variation){
+      if(!this.sounds[name][variation].sound.playing()) return;
+      this.sounds[name][variation].sound.fade(1, 0, 1000);
     },
     load_sound(name, variation){
       if(!this.sounds[name]) this.sounds[name] = [];
@@ -96,7 +105,9 @@ var app = new Vue({
       this.selection = undefined;
     },
     select_next(){
+      if(!this.room?.world) return;
       let allies = this.room.world.entities.filter(e=>e.owner==this.id);
+      if(!allies.length) return;
       this.selection = allies[this.selection_index%allies.length].id;
       this.selection_index ++;
     },
@@ -118,28 +129,26 @@ var app = new Vue({
     },
     on_keyup(e){
       let creations = this.what_is(this.selection)?.creations;
-
       switch (e.key) {
         case 'a':
           if(!creations || !creations[0].possible) break;
           this.creation(creations[0].type)
-        break;
+          return false;
         case 'z':
           if(!creations || !creations[1].possible) break;
           this.creation(creations[1].type)
-        break;
+          return false;
         case 'Tab':
           this.select_next();
           e.preventDefault();
-        break;
+          return false;
         case ' ':
           this.unselect();
           e.preventDefault();
-        break;
+          return false;
         default:
           break;
       }
-      console.log(e);
     }
   },
 });

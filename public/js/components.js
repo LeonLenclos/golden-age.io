@@ -236,25 +236,35 @@ Vue.component('selection', {
 // entity-img
 Vue.component('join-room', {
   data:function(){return {
-    player:'',
-    room:'',
+    player:readCookie('playername')||'',
+    room:readCookie('favoriteroom')||'',
   };},
   methods:{
     join(){
+      createCookie('favoriteroom', this.room)
+      createCookie('playername', this.player)
       this.$emit('join_room', this.player, this.room);
     }
+
   },
   template: `
-  <div class="fullscreen" id="join-room">
-    <h2>Join a room</h2>
+  <div
+  class="fullscreen"
+  id="join-room"
+  @keyup.enter="join()">
+    <h1>Join a room</h1>
     <div>
-      <label for="player">Your name: </label><input name="player" v-model="player"/>
+      <label for="player">Your name</label>
+      <input name="player" v-model="player"/>
     </div>
     <div>
-      <label for="room">Room name: </label><input name="room"  v-model="room"/>
+      <label for="room">Room name</label>
+      <small>To have more chance to find an opponent, leave this field empty!</small>  
+      <input name="room"  v-model="room"/>
     </div>
+
     <div>
-      <button @click="join">join room</button>
+      <button @click="join">join</button>
     </div>
   </div>
     `
@@ -267,7 +277,7 @@ Vue.component('loading', {
 
   template: `
   <div class="fullscreen" id="loading">
-    <h2>Loading</h2>
+    <h1>Loading</h1>
     <fill-bar :value="progress" max=1 :percent="true"></fill-bar>
   </div>
     `
@@ -276,8 +286,8 @@ Vue.component('loading', {
 Vue.component('start', {
   template: `
   <div class="fullscreen" id="start">
-    <h2>Golden Age</h2>
-    <button @click="$emit('start')">Start</button>
+    <h1>Golden Age</h1>
+    <button @click="$emit('start')">start</button>
   </div>
     `
 });
@@ -301,6 +311,7 @@ Vue.component('main-map', {
   ],
   watch:{
     world(new_world, old_world){
+      if(!new_world) return;
       this.entities = new_world.entities;
       this.allies = this.entities.filter(e=>e.owner==this.$root.id);
     }

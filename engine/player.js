@@ -21,7 +21,7 @@ export class Player {
   constructor(name, id){
     this.name = name || DEFAULT_PLAYER_NAME;
     this.id = id;
-    this.gold = 50;
+    this.gold = 20;
     this.gold_max = GOLD_MAX;
     this.color = 'white';
     this.room = undefined;
