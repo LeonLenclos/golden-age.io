@@ -5,13 +5,22 @@ import {Entity, Unit} from './entity.js';
 const TURN_INTERVAL_TIME = 1250; //ms
 const DEFAULT_ROOM_NAME = 'somewhere';
 const MAX_PLAYERS = 2;
-const TURN_MAX = 500;
+const TURN_MAX = 10;
 const START_COUNTDOWN = -10;
 
 const PLAYING = 'playing';
 const NOT_STARTED = 'not started';
 const PAUSED = 'paused';
 const ENDED = 'ended';
+
+const TIMESOUT = 'timesout';
+const ECONOMIC = 'economic';
+const MILITARY = 'military';
+const CONCEDE = 'concede';
+
+const LOOSE = 'loose';
+const WIN = 'win';
+const DRAW = 'draw';
 
 export let rooms = [];
 
@@ -71,33 +80,47 @@ export class Room {
     this.players.push(player);
   }
 
-  set_victory(victory, player){
-    this.set_playing(ENDED);
-    this.players.forEach(p => {
-      p.victory = ((p==player)==victory)
-    });
+  victory_condition(){
+    let winner = undefined;
+    let victory = undefined;
+    let p1 = this.players[0];
+    let p2 = this.players[1];
+    if (this.turn >= this.turn_max){
+      if (p1.gold > p2.gold) winner = p1;
+      if (p2.gold > p1.gold) winner = p2;
+      victory = TIMESOUT;
+    }
+    if (this.players.find(p=>p.gold>p.gold_max)){
+      if (p1.gold > p2.gold) winner = p1;
+      if (p2.gold > p1.gold) winner = p2;
+      victory = ECONOMIC
+    }
+    const units_length = p => this.world.entities.filter(e=>e instanceof Unit && p.own(e)).length; 
+    if (this.players.find(p=>units_length(p)==0)){
+      if (units_length(p1) > units_length(p2)) winner = p1;
+      if (units_length(p2) > units_length(p1)) winner = p2;
+      victory = MILITARY;
+    }
+    if (this.players.find(p=>p.concede)){
+      if (p2.concede && ! p1.concede) winner = p1;
+      if (p1.concede && ! p2.concede) winner = p2;
+      victory = CONCEDE;
+    }
+    if(victory){
+      this.set_playing(ENDED);
+      this.players.forEach(p=>{p.set_victory(
+        (winner == p1 ? WIN : winner ? LOOSE : DRAW), victory
+      )});
+      return true;
+    }
+    return false;
   }
 
   update(){
     if(this.playing == PLAYING){
       this.turn ++;
       this.world.update();
-      this.players.forEach(player => {
-        if(player.gold >= player.gold_max){
-          this.set_victory(true, player);
-          return;
-        }
-        if(this.turn >= this.turn_max){
-          this.set_victory(this.players[0].gold > this.players[1].gold, this.players[0]);
-          return;
-        }
-        let unit_allies = this.world.entities.filter(e=>e.owner==player && e instanceof Unit)
-        if(unit_allies.length <= 0){
-          this.set_victory(false, player);
-          return;
-        }
-      });
-      
+      this.victory_condition();      
       this.emit('turn', this.get_state());
     }
     else if(this.playing == NOT_STARTED){

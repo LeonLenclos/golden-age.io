@@ -29,6 +29,14 @@ export class Player {
     players.push(this);
   }
 
+  set_victory(status, reason){
+    this.victory = {status, reason};
+  }
+  
+  own(entity){
+    return entity.owner == this;
+  }
+
   quit(){
     this.room?.remove_player(this);
   }

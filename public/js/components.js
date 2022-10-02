@@ -161,10 +161,7 @@ Vue.component('player-card', {
 
   <div class="playercard">
     <header>
-      <h2><player-name :player=player></player-name><span v-if="is_you"> (you)</span></h2>
-      <h2 v-if="player.victory===true">WINNER</h2>
-      <h2 v-if="player.victory===false">LOOSER</h2>
-      
+      <h2><player-name :player=player></player-name><span v-if="is_you"> (you)</span></h2>      
     </header>
     <main>
       <fill-bar class="gold-bar" :value="player.gold" :max="player.gold_max"></fill-bar>

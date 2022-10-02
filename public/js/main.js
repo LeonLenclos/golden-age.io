@@ -32,7 +32,7 @@ var app = new Vue({
       if(new_room.turn != old_room.turn){
         this.play_sound('theme', 0);
       }
-      if(new_room.playing =! old_room.playing
+      if(new_room.playing != old_room.playing
         && new_room.playing == 'ended'){
         this.stop_sound('theme', 0);
 
