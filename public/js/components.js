@@ -293,6 +293,53 @@ Vue.component('start', {
     `
 });
 
+Vue.component('end', {
+  props: ['status', 'reason'],
+  methods: {
+    get_reason(){
+      const sentences = {
+        timesup:{
+          win:   "Time is up and you have more gold than your opponent.",
+          loose: "Time is up and you have less gold than your opponent.",
+          draw:  "Time is up and you have the same amount of gold.",
+        },
+        economic:{
+          win:   "You have reached 500 gold.",
+          loose: "Your opponent has reached 500 gold.",
+          draw:  "You have reached 500 gold at the same time.",
+        },
+        military:{
+          win:   "All opponent's units are dead.",
+          loose: "All your units are dead.",
+          draw:  "The last units died at the same time.",
+        },
+        concede:{
+          win:   "Your opponent has conceded.",
+          loose: "You conceded.",
+          draw:  "You both conceded at the same time.",
+        },
+      }
+      console.log(this.reason, this.status, sentences[this.reason][this.status]);
+      return sentences[this.reason][this.status];
+    },
+    get_status(){
+      const sentences = {
+        win:   "You win !",
+        loose: "You loose...",
+        draw:  "It's a draw !",
+      }
+      return sentences[this.status];
+    }
+  },
+  template: `
+  <div class="panel" title="inspector" id="inspector">
+    <small>{{get_reason()}}</small>
+    <h2>{{get_status()}}</h2>
+  </div>
+  `
+
+});
+
 Vue.component('main-map', {
   data(){
     return {

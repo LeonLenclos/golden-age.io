@@ -55,7 +55,7 @@
       <aside>
         <div class="panel"
         id="selection"
-        v-if=room
+        v-if="room?.playing=='playing'"
         >
         <div class="selection-actions">
           <button
@@ -72,7 +72,15 @@
           :mission="what_is(selection)?.mission"
           @creation=creation
           ></selection>
-      </div>
+        </div>
+        <end
+          v-else-if="room?.playing=='ended'"
+          :status="who_is(id).victory.status"
+          :reason="who_is(id).victory.reason"
+          ></end>
+          <div class="panel"
+          v-else
+          ></div>
   
       </aside>
 
