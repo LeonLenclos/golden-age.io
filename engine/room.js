@@ -5,7 +5,7 @@ import {Entity, Unit} from './entity.js';
 const TURN_INTERVAL_TIME = 1250; //ms
 const DEFAULT_ROOM_NAME = 'somewhere';
 const MAX_PLAYERS = 2;
-const TURN_MAX = 10;
+const TURN_MAX = 500;
 const START_COUNTDOWN = -10;
 
 const PLAYING = 'playing';

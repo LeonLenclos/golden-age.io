@@ -54,13 +54,13 @@ io.on('connection', (socket) => {
     entity.set_creation(type);
   });
 
-  socket.on('target', (unit_id, pos) => {
+  socket.on('target', (entity_id, pos) => {
     let player = get_player(socket.id);
     if(!player) return;
-    let unit = player.room.world.get_entity(unit_id);
-    if(!unit || !unit.set_target) return;
+    let entity = player.room.world.get_entity(entity_id);
+    if(!entity) return;
     pos = V(pos.x, pos.y);
-    unit.set_target(pos);
+    entity.set_target(pos);
   });
 
   socket.on('msg', (msg) => {

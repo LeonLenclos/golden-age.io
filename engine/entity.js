@@ -211,6 +211,11 @@ export class Building extends Entity {
     this.actions = [Create];
   }
 
+  set_target(pos){
+    this.get_resident()?.set_target(pos);
+  }
+
+
   can_create(constructor){
     return super.can_create(constructor) && Boolean(this.get_resident());
 

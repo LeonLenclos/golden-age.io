@@ -10,7 +10,6 @@ var app = new Vue({
     id:undefined,
     selection:undefined,
     selection_index: 0,
-    mission_selected:undefined,
     inspected_pos:{},
     messages:[],
     room:undefined,
@@ -92,14 +91,19 @@ var app = new Vue({
       this.inspected_pos=pos;
     },
     select(pos){
-      this.mission_selected = undefined;
       let entities = this.room.world.entities.filter(e=>
         e.pos.x==pos.x && e.pos.y==pos.y
         && e.owner==this.id
-        && e.id != this.selection
       );
+      if(entities.length == 0) return;
       let entity = entities.find(e=>e.building) || entities[0]
-      this.selection = entity?.id;
+      if(!entity) return;
+      if(entity.id == this.selection){
+        this.unselect();
+      }
+      else {
+        this.selection = entity?.id;
+      }
     },
     unselect(){
       this.selection = undefined;
@@ -114,7 +118,7 @@ var app = new Vue({
     creation(type){
       if(!this.selection) return;
       socket.emit('creation', this.selection, type);
-
+      this.unselect();
     },
     target(pos){
       if(!this.selection) return;
