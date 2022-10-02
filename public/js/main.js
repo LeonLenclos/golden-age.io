@@ -146,6 +146,10 @@ var app = new Vue({
           this.unselect();
           e.preventDefault();
           return false;
+        case 'Enter':
+          this.$refs.messages.give_focus();
+          e.preventDefault();
+          return false;  
         default:
           break;
       }

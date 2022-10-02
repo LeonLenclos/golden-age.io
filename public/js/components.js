@@ -16,7 +16,11 @@ Vue.component('messages', {
     });
   },
   methods:{
+    give_focus(){
+      this.$refs.input.focus();
+    },
     send(){
+      if(this.input.length==0) return;
       this.$emit('send_message', this.input);
       this.input = '';
     }
@@ -33,7 +37,7 @@ Vue.component('messages', {
       </li>
     </ul>
     <form @submit.prevent>
-      <input v-model="input" name="msg"/>
+      <input ref="input" v-model="input" name="msg"/>
       <button @click="send">say</button>
     </form>
   </div>
