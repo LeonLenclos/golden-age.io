@@ -57,6 +57,7 @@ export class World {
           break;
         }
       }
+      if(this.protected_path) break;
     }
 
     if(!this.protected_path){
