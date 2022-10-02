@@ -4,11 +4,11 @@ import {Gold, Water} from './entity.js';
 import {find_path} from './path.js';
 const DEFAULT_SIZE = V(20, 15)
 const GOLD_NOISE_SCALE = 2.5;
-const GOLD_NOISE_THRESHOLD = .5;
+const GOLD_NOISE_THRESHOLD = .75;
 const WATER_NOISE_SCALE = .2;
 const WATER_LEVEL = .1;
 const PLAINS_LEVEL = .35;
-const WATER_NOISE_POWER = 4;
+const WATER_NOISE_POWER = 5;
 
 export class World {
   constructor(){
@@ -23,7 +23,9 @@ export class World {
     const symetric = (pos) => this.size.subtract(pos).subtract(V(1,1));
     const gold_at = (pos) => {
       pos = pos.multiply (GOLD_NOISE_SCALE);
-      return gold_noise(pos.x,pos.y) > GOLD_NOISE_THRESHOLD;
+      let noise = ((1+gold_noise(pos.x,pos.y))/2);
+      let gold_intensity = (noise-GOLD_NOISE_THRESHOLD)/(1-GOLD_NOISE_THRESHOLD)
+      return Math.max(0, gold_intensity);
     }
 
     const water_at = (pos) => {
@@ -32,8 +34,12 @@ export class World {
       level *= Math.sin(Math.PI*pos.y/this.size.y);
       level = Math.min(level, PLAINS_LEVEL)
       pos = pos.multiply(WATER_NOISE_SCALE);
-      level *= (1+water_noise(pos.x,pos.y)/2)**WATER_NOISE_POWER;
-      return level < WATER_LEVEL;
+      let noise = ((1+water_noise(pos.x,pos.y))/2);
+      // level -= noise*PLAINS_LEVEL**WATER_NOISE_POWER;
+      level -= (noise**WATER_NOISE_POWER)*0.9;
+      // level -= (noise**WATER_NOISE_POWER)*0.7;
+      // level *= noise**WATER_NOISE_POWER;
+      return level <= WATER_LEVEL;
     }
 
 
@@ -77,8 +83,11 @@ export class World {
       for (var y = 0; y < this.size.y; y++) {
         let pos = V(x, y);
 
-        if ((gold_at(pos) || gold_at(symetric(pos))) && this.is_spawnable(pos)){
-          this.add_entity(new Gold(pos));
+        let level = (gold_at(pos) + gold_at(symetric(pos)))/2
+        if (level > 0 && this.is_spawnable(pos)){
+          let gold = new Gold(pos)
+          gold.set_size(level)
+          this.add_entity(gold);
         }
       }
     }

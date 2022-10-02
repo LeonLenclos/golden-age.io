@@ -139,11 +139,13 @@ export class Gold extends Entity {
   static hp = 10;
   static cost = 0;
 
-  constructor(pos, owner){
+  constructor(pos){
     super(pos)
-    let level = Math.floor(1+Math.random()*5)
-    this.hp_max = this.hp = Gold.hp * level;
+  }
 
+  set_size(value){
+    let level = Math.floor(1+value*5)
+    this.hp_max = this.hp = Gold.hp * level;
   }
 }
 
