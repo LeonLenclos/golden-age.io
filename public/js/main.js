@@ -1,6 +1,3 @@
-// import VueHotkey from 'v-hotkey'
-// Vue.use(VueHotkey);
-
 var socket = io();
 
 var app = new Vue({
@@ -15,7 +12,6 @@ var app = new Vue({
     room:undefined,
     sounds:{},
     loading:0
-    // music:undefined;
   },
   mounted: function () {
 

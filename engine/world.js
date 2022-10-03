@@ -35,10 +35,7 @@ export class World {
       level = Math.min(level, PLAINS_LEVEL)
       pos = pos.multiply(WATER_NOISE_SCALE);
       let noise = ((1+water_noise(pos.x,pos.y))/2);
-      // level -= noise*PLAINS_LEVEL**WATER_NOISE_POWER;
       level -= (noise**WATER_NOISE_POWER)*0.9;
-      // level -= (noise**WATER_NOISE_POWER)*0.7;
-      // level *= noise**WATER_NOISE_POWER;
       return level <= WATER_LEVEL;
     }
 

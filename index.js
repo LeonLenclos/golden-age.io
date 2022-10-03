@@ -1,8 +1,6 @@
 import express from 'express'
 import http from 'http'
-// import path from 'path';
 import {Server} from 'socket.io'
-// import {fileURLToPath} from 'url';
 import dir_tree from 'directory-tree';
 
 import {rooms, get_room} from './engine/room.js';
@@ -13,13 +11,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-// app.use(express.static(path.join(__dirname, '/public')));
 const files_callback = (item, path) => {
   item.path = path.substring('/public'.length);
   item.name = item.name.split('.')[0];
 };
+
 const assets_tree = dir_tree('./public/assets', {attributes:["extension"]}, files_callback);
 
 app.use(express.static('./public'));

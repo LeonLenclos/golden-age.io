@@ -4,7 +4,6 @@ import {Entity, Unit} from './entity.js';
 
 const TURN_INTERVAL_TIME = 1250; //ms
 const DEFAULT_ROOM_NAME = 'somewhere';
-const MAX_PLAYERS = 2;
 const TURN_MAX = 500;
 const START_COUNTDOWN = -10;
 
@@ -36,11 +35,12 @@ export class Room {
     this.io = io;
     this.players = [];
     this.world = new World();
-    rooms.push(this);
-    this.turn_interval_id = setInterval(()=>{this.update()}, TURN_INTERVAL_TIME)
     this.turn = START_COUNTDOWN;
     this.turn_max = TURN_MAX;
     this.playing = NOT_STARTED;
+    
+    this.turn_interval_id = setInterval(()=>{this.update()}, TURN_INTERVAL_TIME)
+    rooms.push(this);
   }
 
   emit(...args){
@@ -56,7 +56,7 @@ export class Room {
   }
 
   is_free(){
-    return this.playing == NOT_STARTED && this.players.length < MAX_PLAYERS;
+    return this.playing == NOT_STARTED && this.players.length < 2;
   }
 
   remove_player(player){

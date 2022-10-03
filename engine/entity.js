@@ -1,6 +1,5 @@
 import urid from 'urid';
 import {
-  Action,
   Walk,
   Mine,
   Attack,
@@ -11,19 +10,6 @@ import {
 } from './action.js';
 
 import {find_nearest_path} from './path.js';
-
-
-
-// unused
-function random_stat(min, max, dices){
-  dices = dices || 5;
-    let result = 0;
-    for(let i= 0; i< dices; i++) result += Math.random();
-    return Math.floor((result/dices)*(max-min+1))+min
-}
-
-
-
 
 export class Entity {
 
@@ -52,6 +38,10 @@ export class Entity {
     this.creation.start_construction();
 
   }
+  
+  set_sprite(sprite){
+    this.sprite = sprite;
+  }
 
   start_construction(){
     this.cost_payed = false;
@@ -59,9 +49,6 @@ export class Entity {
     this.under_construction = true;
   }
 
-  set_sprite(sprite){
-    this.sprite = sprite;
-  }
 
   is_alive(){
     return this.hp>0;
@@ -87,7 +74,6 @@ export class Entity {
       if(action.is_possible() && done.indexOf(constructor>=0)){
         action.do();
         done.push(constructor);
-        // i = 0;
         break;
       }
     }
@@ -101,8 +87,6 @@ export class Entity {
     }
 
     if(!this.world) return;
-
-
   }
 
   can_create(constructor){
@@ -133,7 +117,6 @@ export class Entity {
 }
 
 
-
 export class Gold extends Entity {
   static type = 'gold';
   static hp = 10;
@@ -150,13 +133,9 @@ export class Gold extends Entity {
 }
 
 
-
 export class Water extends Entity {
   static type = 'water';
-
 }
-
-
 
 
 export class Unit extends Entity {
@@ -177,11 +156,6 @@ export class Unit extends Entity {
     return (allies+1)/5;
   }
 
-  get_state() {
-    let state = super.get_state();
-    return state;
-  }
-
   set_target(pos){
     this.target = pos;
     this.path = find_nearest_path(this.pos, this.target, this.world);
@@ -195,12 +169,6 @@ export class Unit extends Entity {
 
   can_create(constructor){
     return super.can_create(constructor) &&  this.world.get_entities_at(this.pos).length == 1;
-
-  }
-
-  update(){
-    super.update();
-
   }
 }
 
