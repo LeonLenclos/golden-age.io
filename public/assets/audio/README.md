@@ -21,9 +21,9 @@
 * `new-gold-0.mp3`
 * `new-unit-0.mp3`
 * `new-building-0.mp3`
-* `dead-gold-0.mp3`
-* `dead-unit-0.mp3`
-* `dead-building-0.mp3`
+* `kill-gold-0.mp3`
+* `kill-unit-0.mp3`
+* `kill-building-0.mp3`
 * `ui-chat-0.mp3`
 * `ui-select-0.mp3`
 * `ui-target-0.mp3`
