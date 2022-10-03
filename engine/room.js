@@ -109,7 +109,7 @@ export class Room {
     if(victory){
       this.set_playing(ENDED);
       this.players.forEach(p=>{p.set_victory(
-        (winner == p1 ? WIN : winner ? LOOSE : DRAW), victory
+        (winner == p ? WIN : winner ? LOOSE : DRAW), victory
       )});
       return true;
     }
