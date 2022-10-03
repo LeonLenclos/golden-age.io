@@ -1,8 +1,4 @@
-import astar from 'a-star';
-import {new_vector as V} from './vector.js';
 import {
-  House,
-  Factory,
   Unit,
   Gold,
   Building,
@@ -20,10 +16,7 @@ export class Action {
   is_possible(){
     return true;
   }
-
-  get_progress(){
-    return 1;
-  }
+  
   pay_cost(){
     let cost = this.constructor.cost;
     if(this.entity.owner.gold >= cost){
@@ -33,7 +26,6 @@ export class Action {
     return false;
   }
 
-  // override me !
   do(){
     return;
   }
@@ -82,7 +74,6 @@ export class Walk extends Action {
 export class Mine extends Action {
 
   static type = 'mine';
-
 
   get_gold(){
     let entities = this.entity.world.get_entities_at(this.entity.pos)
@@ -185,8 +176,9 @@ export class Reside extends Action {
   do(){
     this.entity.set_sprite('flag');
   }
-
+  
 }
+
 export class Create extends Action {
 
   static type = 'create'
