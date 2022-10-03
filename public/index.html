@@ -46,7 +46,7 @@
       ref=map
       :players="room?.players"
       :world="room?.world"
-      :entities="filter_visible()"
+      :entities="filter_visible(room?.world.entities)"
       :selection=selection
       @inspect=inspect
       @select=select

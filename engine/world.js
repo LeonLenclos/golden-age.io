@@ -14,6 +14,7 @@ export class World {
   constructor(){
     this.size = DEFAULT_SIZE;
     this.entities = [];
+    this.events = [];
     this.protected_path = undefined;
     this.start_positions = [];
 
@@ -93,7 +94,8 @@ export class World {
   get_state(){
     return {
       size:this.size,
-      entities:this.entities.map((e)=>e.get_state())
+      entities:this.entities.map((e)=>e.get_state()),
+      events:this.events.map((e)=>e.get_state())
     };
   }
 
@@ -130,14 +132,22 @@ export class World {
   }
 
   update(){
+    this.events = this.events.filter(e=>!e.done);
     this.entities = this.entities.filter(e=>e.is_alive());
+
     this.entities.forEach((e) => e.update());
     this.entities.forEach((e) => e.walk());
     this.entities.forEach((e) => e.do());
+    this.events.forEach((e) => e.update());
   }
 
   add_entity(entity){
     this.entities.push(entity);
     entity.world=this;
   }
+
+  add_event(event){
+    this.events.push(event);
+  }
+
 }

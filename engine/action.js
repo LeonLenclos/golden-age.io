@@ -219,9 +219,10 @@ export class Create extends Action {
   spawn_creaion(){
     let pos = this.get_pos();
     if(!pos) return;
-    this.entity.creation.pos = pos;
-    this.entity.world.add_entity(this.entity.creation);
+    let creation = this.entity.creation;
     this.entity.creation = undefined;
+    creation.pos = pos;
+    this.entity.world.add_entity(creation);
   }
 
   is_possible(){
@@ -249,6 +250,7 @@ export class Create extends Action {
 
     if(!this.entity.creation.under_construction){
       this.spawn_creaion();
+
     }
   }
 }

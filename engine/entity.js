@@ -8,6 +8,7 @@ import {
   Reside,
   Create,
 } from './action.js';
+import { New, Kill } from './events.js';
 
 import {find_nearest_path} from './path.js';
 
@@ -36,7 +37,7 @@ export class Entity {
     if(!this.can_create(constructor)) return;
     this.creation = new constructor(this.pos, this.owner);
     this.creation.start_construction();
-
+    this.creation.world = this.world;
   }
   
   set_sprite(sprite){
@@ -55,7 +56,13 @@ export class Entity {
   }
 
   hit(damage){
-    return this.hp=Math.max(0,this.hp-damage);
+    let new_hp = Math.max(0,this.hp-damage);
+    this.hp = new_hp
+    if(new_hp == 0){
+      let type = this instanceof Building ? Building.type : this.constructor.type
+      this.world.add_event(new Kill(this.pos, this.owner, type))
+    }
+    return new_hp;
   }
 
   walk(){
@@ -84,6 +91,9 @@ export class Entity {
 
     if(this.under_construction && this.hp >= this.hp_max){
       this.under_construction = false;
+      let type = this instanceof Building ? Building.type : this.constructor.type
+      this.world.add_event(new New(this.pos, this.owner, type))
+  
     }
 
     if(!this.world) return;

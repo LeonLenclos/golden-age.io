@@ -17,7 +17,6 @@ var app = new Vue({
    fetch('/assets.json')
    .then(response => response.json())
    .then(assets => {
-    console.log(assets)
       let audio_dir = assets.children.find(dir=>dir.name=='audio');  
       audio_dir.children.forEach(file => {
         if(file.extension=='.mp3') this.load_sound(file.name);
@@ -33,18 +32,27 @@ var app = new Vue({
       if(!new_room || !old_room) return;
       if(new_room.turn != old_room.turn){
         this.play_sound_once('theme', 0);
-        let visibles = this.filter_visible();
+        let visibles_entitites = this.filter_visible(new_room.world.entities);
         ['mine', 'build', 'attack', 'critical'].forEach(action=>{
-          let count = visibles.filter((e)=>e.sprite == action).length;
+          let count = visibles_entitites.filter((e)=>e.sprite == action).length;
           if(count > 0){
             this.play_sound(`action-${action}`, 3, Math.min(count-1, 2));
           }
-        })
+        });
+        let visibles_events = this.filter_visible(new_room.world.events);
+        ['kill', 'new'].forEach(type=>{
+          ['unit', 'gold', 'building'].forEach(secondary_type=>{
+            let count = visibles_events.filter((e)=>e.type == type && e.secondary_type == secondary_type).length;
+            if(count > 0){
+              this.play_sound(`${type}-${secondary_type}`);
+            }
+          });
+        });
       }
       if(new_room.playing != old_room.playing
         && new_room.playing == 'ended'){
         this.stop_sound('theme', 0);
-        if(this.who_is(this.id).victory.status=='winner'){
+        if(this.who_is(this.id).victory.status=='win'){
           this.play_sound('ui-winner');
         } else {
           this.play_sound('ui-looser');
@@ -158,14 +166,14 @@ var app = new Vue({
       this.play_sound('ui-target', 3);
       this.selection = undefined;
     },
-    filter_visible(entities){
-      entities = entities || this.room?.world.entities;
-      if(entities == undefined) return [];
-      if(this.room.playing == 'ended') return entities;
+    filter_visible(objects){
+      objects = objects || this.room?.world.entities;
+      if(objects == undefined) return [];
+      if(this.room.playing == 'ended') return objects;
       if(this.room.playing != 'playing') return [];
-      let allies = entities.filter(e=>e.owner==this.id)
-      return entities.filter(e=>{
-        return allies.some(a=>{
+      let allies = this.room.world.entities.filter(e=>e.owner==this.id)
+      return objects.filter(e=>{
+        return e.owner == this.id || allies.some(a=>{
           return Math.abs(e.pos.x-a.pos.x) + Math.abs(e.pos.y-a.pos.y) < 4
         });
       });
