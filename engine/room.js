@@ -90,7 +90,7 @@ export class Room {
       if (p2.gold > p1.gold) winner = p2;
       victory = TIMESOUT;
     }
-    if (this.players.find(p=>p.gold>p.gold_max)){
+    if (this.players.find(p=>p.gold>=p.gold_max)){
       if (p1.gold > p2.gold) winner = p1;
       if (p2.gold > p1.gold) winner = p2;
       victory = ECONOMIC
