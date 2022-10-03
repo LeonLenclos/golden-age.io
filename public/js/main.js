@@ -33,6 +33,13 @@ var app = new Vue({
       if(!new_room || !old_room) return;
       if(new_room.turn != old_room.turn){
         this.play_sound_once('theme', 0);
+        let visibles = this.filter_visible();
+        ['mine', 'build', 'attack', 'critical'].forEach(action=>{
+          let count = visibles.filter((e)=>e.sprite == action).length;
+          if(count > 0){
+            this.play_sound(`action-${action}`, 3, Math.min(count-1, 2));
+          }
+        })
       }
       if(new_room.playing != old_room.playing
         && new_room.playing == 'ended'){
@@ -150,6 +157,18 @@ var app = new Vue({
       socket.emit('target', this.selection, pos);
       this.play_sound('ui-target', 3);
       this.selection = undefined;
+    },
+    filter_visible(entities){
+      entities = entities || this.room?.world.entities;
+      if(entities == undefined) return [];
+      if(this.room.playing == 'ended') return entities;
+      if(this.room.playing != 'playing') return [];
+      let allies = entities.filter(e=>e.owner==this.id)
+      return entities.filter(e=>{
+        return allies.some(a=>{
+          return Math.abs(e.pos.x-a.pos.x) + Math.abs(e.pos.y-a.pos.y) < 4
+        });
+      });
     },
     who_is(id){
       return this.room?.players.find(p=>p.id==id);

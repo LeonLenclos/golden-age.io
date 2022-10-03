@@ -347,21 +347,20 @@ Vue.component('main-map', {
       drag_from:{x:0,y:0},
       map_pos:{x:0,y:0},
       hover_pos:undefined,
-      entities:[],
       allies:[],
 
     };
   },
   props: [
+    'entities',
     'players',
     'world',
     'selection',
   ],
   watch:{
-    world(new_world, old_world){
-      if(!new_world) return;
-      this.entities = new_world.entities;
-      this.allies = this.entities.filter(e=>e.owner==this.$root.id);
+    entities(new_entities){
+      if(!new_entities) return;
+      this.allies = new_entities.filter(e=>e.owner==this.$root.id);
     }
   },
   methods:{
@@ -392,7 +391,7 @@ Vue.component('main-map', {
     },
     is_targetable(pos){
       // need target pos and selection
-      if(!pos || !this.selection) return false;
+      if(!pos || !this.selection) return false;
       // can't target itself
       if(this.allies_at(pos).some(e=>e.id == this.selection)) return false;
       let entity = this.$root.what_is(this.selection);
