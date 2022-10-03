@@ -9,7 +9,7 @@
 
     <start
     v-if="!started"
-    @start="started=true"
+    @start="start()"
     ></start>
     <loading
       v-else-if="loading<1"

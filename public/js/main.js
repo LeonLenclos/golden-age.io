@@ -14,14 +14,6 @@ var app = new Vue({
     loading:0
   },
   mounted: function () {
-   fetch('/assets.json')
-   .then(response => response.json())
-   .then(assets => {
-      let audio_dir = assets.children.find(dir=>dir.name=='audio');  
-      audio_dir.children.forEach(file => {
-        if(file.extension=='.mp3') this.load_sound(file.name);
-      });
-   })
 
     document.addEventListener('keyup', (e)=>{
       return this.on_keyup(e)
@@ -61,6 +53,17 @@ var app = new Vue({
     }
   },
   methods: {
+    start(){
+      this.started=true;
+      fetch('/assets.json')
+      .then(response => response.json())
+      .then(assets => {
+         let audio_dir = assets.children.find(dir=>dir.name=='audio');  
+         audio_dir.children.forEach(file => {
+           if(file.extension=='.mp3') this.load_sound(file.name);
+         });
+      });   
+    },
     get_sound(name, variations, intensity){
       variations = variations || 0;
       let variation = Math.floor(Math.random()*variations)
@@ -97,12 +100,13 @@ var app = new Vue({
     },
     check_loading(){
       let total = 0;
-      total += this.sounds.length;
-      if(total == 0) return 0;
       let loaded = 0;
       for (var name in this.sounds) {
+        total ++;
         if(this.sounds[name].loaded) loaded++;
       }
+      if(total == 0) return 0;
+      console.log(`${loaded}/${total}`)
       this.loading = loaded/total;
     },
     join_room(player_name, room_name){
