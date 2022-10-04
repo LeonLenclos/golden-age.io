@@ -584,14 +584,14 @@ Vue.component('cell', {
     }
   },
   template: `
-
   <div :class="{cell:true, inspected:is_inspected(), visible:visible}">
-    <entity-img
-      v-if=visible
-      v-for="entity in entities?.sort(sorting)"
-      :entity=entity
-      :selected="is_selected(entity)"
-      draggable="false"
+
+
+    <entity
+    v-if=visible
+    v-for="entity in entities?.sort(sorting)"
+    :entity=entity
+    draggable="false"
     />
     <action-img
       v-if="is_inspected() && this.$root.mission_selected"
@@ -600,3 +600,13 @@ Vue.component('cell', {
   </div>
     `
 });
+
+/*
+    <entity-img
+      v-if=visible
+      v-for="entity in entities?.sort(sorting)"
+      :entity=entity
+      :selected="is_selected(entity)"
+      draggable="false"
+    />
+*/

@@ -157,17 +157,17 @@ button[disabled]>*{
 
 
 .cell.visible {
-  background: lightgreen
+  background: #86E4D5;
 }
 
 @keyframes moving {
   from{
-    top:var(--top-offset);
-    left:var(--left-offset);
+    padding-top:var(--top-offset);
+    padding-left:var(--left-offset);
   }
   to{
-    top:0;
-    left:0;
+    padding-top:0;
+    padding-left:0;
   }
 }
 
@@ -178,7 +178,7 @@ button[disabled]>*{
  {
   --top-offset: 0;
   --left-offset: 0;
-   position: relative;
+   position: absolute;
    animation-duration: .5s;
    animation-name: moving;
    /* animation-timing-function: ease-in; */
@@ -534,3 +534,46 @@ section.players{
   
   
 }
+
+
+svg{
+  display:inline;
+  fill:#5bf713;
+  stroke:#000000;
+  stroke-width:1px;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.ally path[data-color="player"]{
+  fill:#FBC099;
+}
+
+
+.enemy path[data-color="player"]{
+  fill:#A9E1FD;
+}
+
+path[data-color="water"]{
+  fill:#8577C7;
+  stroke:#60568e;
+
+}
+
+.water {
+  background: #8577C7;
+}
+
+
+path[data-color="silver"]{
+  fill:#FDF3FD;
+}
+
+path[data-color="iron"]{
+  fill:#AD9EAC;
+}
+
+path[data-color="gold"]{
+  fill:#F7E9A2;
+}
+
