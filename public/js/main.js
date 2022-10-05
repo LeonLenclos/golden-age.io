@@ -14,10 +14,9 @@ var app = new Vue({
     loading:0
   },
   mounted: function () {
-
-    document.addEventListener('keyup', (e)=>{
-      return this.on_keyup(e)
-    });
+    document.addEventListener('keyup', (e)=>{return this.on_keyup(e)});
+    window.addEventListener('resize', (e)=>{this.on_resize(e)});
+    this.on_resize();
   },
   watch:{
     room(new_room, old_room){
@@ -53,6 +52,16 @@ var app = new Vue({
     }
   },
   methods: {
+    on_resize(){
+      let width = this.$el.clientWidth;
+      let height = this.$el.clientHeight;
+      let root = document.documentElement
+      let aside_width = parseInt(getComputedStyle(root).getPropertyValue('--aside-width'));
+      let margin = 40;//px
+      let world_width =  20;//cells
+      let cell_size = (width-margin-aside_width*2)/ world_width;
+      root.style.setProperty('--cell-size', `${cell_size}px`); 
+    },
     start(){
       this.started=true;
       fetch('/assets.json')
@@ -106,7 +115,6 @@ var app = new Vue({
         if(this.sounds[name].loaded) loaded++;
       }
       if(total == 0) return 0;
-      console.log(`${loaded}/${total}`)
       this.loading = loaded/total;
     },
     join_room(player_name, room_name){

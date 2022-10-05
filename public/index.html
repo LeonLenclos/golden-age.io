@@ -8,88 +8,75 @@
   <main id="app">
 
     <start
-    v-if="!started"
-    @start="start()"
+      v-if="!started"
+      @start="start()"
     ></start>
     <loading
       v-else-if="loading<1"
       :progress="loading"
-      ></loading>
+    ></loading>
     <join-room
       v-else-if="!room"
       @join_room="join_room"
-      ></join-room>
+    ></join-room>
 
-    <header>
+    <header v-if=room>
       <room
-      v-if=room
       :room=room
       @quit_room=quit_room
       ></room>
     </header>
 
-    <main>
-
+    <main v-if=room>
       <aside>
         <messages
-        ref="messages"
-        :messages="messages"
-        @send_message="send_message"
+          ref="messages"
+          :messages="messages"
+          @send_message="send_message"
         ></messages>
         <inspector
-        :pos=inspected_pos
-        :entities="room?.world?.entities.filter(e=>e.pos.x==inspected_pos.x && e.pos.y==inspected_pos.y)"
+          :pos=inspected_pos
+          :entities="room.world?.entities.filter(e=>e.pos.x==inspected_pos.x && e.pos.y==inspected_pos.y)"
         ></inspector>
       </aside>
 
       <main-map
-      ref=map
-      :players="room?.players"
-      :world="room?.world"
-      :entities="filter_visible(room?.world.entities)"
-      :selection=selection
-      @inspect=inspect
-      @select=select
-      @target=target
+        ref=map
+        :players="room?.players"
+        :world="room?.world"
+        :entities="filter_visible(room?.world.entities)"
+        :selection=selection
+        @inspect=inspect
+        @select=select
+        @target=target
       ></main-map>
 
       <aside>
-        <div class="panel"
-        id="selection"
-        v-if="room?.playing=='playing'"
-        >
-        <div class="selection-actions">
-          <button
-            @click="unselect()"
-            :disabled="selection==undefined"
-          >unselect <span class="shortcut">space</span></button>
-          <button
-          @click="select_next()"
-        >select next<span class="shortcut">,</span></button>
-        </div>
-        <selection
-          :selection="what_is(selection)"
-          :creations="what_is(selection)?.creations"
-          :mission="what_is(selection)?.mission"
-          @creation=creation
+        <div v-if="room.playing=='playing'" class="panel" id="selection">
+          <div class="selection-actions">
+            <button @click="unselect()" :disabled="selection==undefined">
+              unselect <span class="shortcut">space</span>
+            </button>
+            <button @click="select_next()">
+              select next<span class="shortcut">,</span>
+            </button>
+          </div>
+          <selection
+            :selection="what_is(selection)"
+            :creations="what_is(selection)?.creations"
+            :mission="what_is(selection)?.mission"
+            @creation=creation
           ></selection>
         </div>
         <end
           v-else-if="room?.playing=='ended'"
           :status="who_is(id).victory.status"
           :reason="who_is(id).victory.reason"
-          ></end>
-          <div class="panel"
-          v-else
-          ></div>
-  
+        ></end>
+        <div v-else class="panel"></div>
       </aside>
 
     </main>
-
-    <footer>
-
-    </footer>
   </main>
   <script src="/socket.io/socket.io.js"></script>
   <script src="js/lib/howler.js"></script>

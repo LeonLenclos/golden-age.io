@@ -1,5 +1,24 @@
 :root {
   --cell-size : 32px;
+  --border-radius : 5px;
+  --aside-width : 300px;
+  /* Palette https://lospec.com/palette-list/japanese-woodblock */
+  /* Maybe try : https://lospec.com/palette-list/vanilla-milkshake */
+  --iron :  #b1a58d ;
+  --silver : #e3cfb4;
+  --black : #2b2821 ;
+  --gold :  #e0c872 ;
+  --dark-gold :  #d4804d;
+  --sand :  #d9ac8b;
+  --dark-sand :  #624c3c ;
+   --water :  #5d7275;
+  --dark-water :  #243d5c;
+  --blue:  #5c8b93;
+  --red:  #b03a48 ;
+}
+
+*{
+  box-sizing: border-box;
 }
 
 html, body {
@@ -10,9 +29,20 @@ html, body {
 
 }
 
-*{
-  box-sizing: border-box;
+body {
+  font-family: monospace;
+  background: var(--black); 
+  color: var(--black); 
+  font-size: 10pt;
+  padding:1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
+
+
+/********* GENERAL *******/
+
 
 h1, h2, h3, h4, p{
   margin: 0;
@@ -20,67 +50,9 @@ h1, h2, h3, h4, p{
 }
 
 h1 {
-  text-transform: uppercase;
-  color: #ffd080;
-  font-size: 14pt;
-  padding: 5px 40px;
+  color: var(--iron);
+  font-size: larger;
 }
-
-body {
-  font-family: monospace;
-  background: #222; 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-strong{
-  background: white;
-}
-
-#app {
-  width: 1130px;
-  height: 700px;
-  display: flex;
-  flex-direction: column;
-    align-items:stretch;
-  /*! justify-content: space-between; */
-
-}
-
-
-#app>main{
-  display: flex;
-  flex-direction: row;
-  align-items:stretch;
-    justify-content: center;
-
-}
-
-#app>main>aside{
-  display: flex;
-  flex-direction: column;
-  width: 230px;
-}
-
-#app>main>aside>:last-child{
-  flex-grow: 1;
-}
-
-.panel{
-}
-
-#selection{
-}
-
-#selection > main{
-}
-
-
-label {
-  font-weight: bold;
-}
-
 
 button {
   border:none;
@@ -92,17 +64,51 @@ button[disabled]>*{
   opacity: .4;
 }
 
-.playername, .entityname{
-  display: inline-block;
-  text-decoration: underline;
+
+/********* MACRO ***********/
+#app {
+  width:100%;
+  min-width:800px;
+  min-height:600px;
+  display: flex;
+  flex-direction: column;
 }
 
+#app>main{
+  display: flex;
+}
+
+#app>main>aside{
+  width:var(--aside-width);
+  display: flex;
+  flex-direction: column;
+}
+
+#app>main>aside>:last-child{
+    flex-grow: 1;
+}
+
+#app>main>#map{
+  flex-grow: 1;
+}
+
+/********* MAP **************/
+
 #map {
- position: relative;
+  background: var(--water);
+  border-radius: var(--border-radius);
   overflow: hidden;
-  background: gray;
-  border-radius: 5px;
   margin:2px;
+}
+
+#map table {
+ border-collapse: collapse;
+ margin:6px auto;
+}
+
+#map td {
+  padding:0;
+  border:1px solid var(--water);
 }
 
 #map .arrow{
@@ -113,28 +119,20 @@ button[disabled]>*{
 }
 
 
-#map table {
- border-collapse: collapse;
- margin:auto;
-}
 
-#map td {
-  padding:0;
-  border:1px solid gray;
-
-}
 .cell {
-  background:darkgray;
+  background:var(--dark-water);
   width:var(--cell-size);
   height: var(--cell-size);
-  border-collapse: collapse;
 }
 
+
+/**** OBSOLETE ****/
 .cell.select:hover:after,
 .cell.target:hover:after {
   content:'';
-  width: 32px;
-  height: 32px;
+  width: var(--cell-size);
+  height: var(--cell-size);
   display: block;
 }
 
@@ -145,6 +143,10 @@ button[disabled]>*{
 .cell.target:hover:after{
   /*    background: url('../assets/gui/target.png');*/
 }
+
+
+/*******/
+
 .cell * {
   position: absolute;
     user-drag: none;
@@ -157,7 +159,7 @@ button[disabled]>*{
 
 
 .cell.visible {
-  background: #86E4D5;
+  background: var(--sand);
 }
 
 @keyframes moving {
@@ -205,18 +207,17 @@ button[disabled]>*{
   filter: drop-shadow(0 0 5px white) drop-shadow(0 0 5px white)  brightness(1.3);
 }
 
+/************** FULL SCREEN COMPONENTS ***************/
+
 .fullscreen {
-  position: absolute;
-  background:gray;
+  background:var(--silver);
   display: flex;
   flex-direction:column;
   justify-content: center;
   align-items: center;
-  z-index:1;
-  top:0;
-  left:0;
   width: 100%;
   height: 100%;
+  border-radius: var(--border-radius);
 }
 
 .fullscreen > *{
@@ -227,8 +228,8 @@ button[disabled]>*{
   height: 50px;
   width: 300px;
   border-radius: 3px;
-
 }
+
 
 #join-room div {
   display: flex;
@@ -241,6 +242,13 @@ button[disabled]>*{
 }
 #loading .fill-bar {
   max-width: 500px;
+}
+
+
+
+.playername, .entityname{
+  display: inline-block;
+  text-decoration: underline;
 }
 
 
@@ -537,43 +545,44 @@ section.players{
 
 
 svg{
+  width:var(--cell-size);
+  height:var(--cell-size);
   display:inline;
-  fill:#5bf713;
-  stroke:#000000;
-  stroke-width:1px;
+  fill:var(--white);
+  stroke:var(--black);
+  stroke-width:0.07em;
   stroke-linecap:round;
   stroke-linejoin:round;
 }
 
 .ally path[data-color="player"]{
-  fill:#FBC099;
+  fill:var(--blue);
 }
 
 
 .enemy path[data-color="player"]{
-  fill:#A9E1FD;
+  fill:var(--red);
 }
 
 path[data-color="water"]{
-  fill:#8577C7;
-  stroke:#60568e;
+  fill:var(--water);
+  stroke:var(--dark-water);
 
 }
-
 .water {
-  background: #8577C7;
+  background: var(--water);
 }
 
 
 path[data-color="silver"]{
-  fill:#FDF3FD;
+  fill:var(--silver);
 }
 
 path[data-color="iron"]{
-  fill:#AD9EAC;
+  fill:var(--iron);
 }
 
 path[data-color="gold"]{
-  fill:#F7E9A2;
+  fill:var(--gold);
 }
 
