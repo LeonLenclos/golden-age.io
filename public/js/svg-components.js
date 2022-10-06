@@ -27,6 +27,7 @@ Vue.component('entity', {
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
         :class="{
+            entity : true,
             ally: entity.owner == $root.id,
             enemy: entity.owner != $root.id,
             water: entity.type=='water',
@@ -183,21 +184,18 @@ Vue.component('entity', {
     
     `
 });
-/*
 
 Vue.component('arrow', {
   data(){
     return{
-      cell_size:33,
     };
   },
-  props:['start', 'end', 'size'],
+  props:['start', 'end', 'size', 'cell_size'],
   methods:{
-    get_width(){return this.cell_size*(this.size.x+1)},
-    get_height(){return this.cell_size*(this.size.y+1)},
-    get_view_box(){
-      return `0 0 ${this.get_width()} ${this.get_height()}`;
-    }
+    get_width(){return this.get_cell_size()*(this.size.x+1)},
+    get_height(){return this.get_cell_size()*(this.size.y+1)},
+    get_cell_size(){return this.cell_size+1},
+    get_view_box(){return `0 0 ${this.get_width()} ${this.get_height()}`},
   },
   template:`
 <svg
@@ -217,13 +215,12 @@ Vue.component('arrow', {
     marker-end='url(#arrow-head)'
     stroke-width='1'
     fill='none' stroke='white'
-    :x1="cell_size*(start.x+.5)"
-    :y1="cell_size*(start.y+.5)"
-    :x2="cell_size*(end.x+.5)"
-    :y2="cell_size*(end.y+.5)"
+    :x1="get_cell_size()*(start.x+.5)"
+    :y1="get_cell_size()*(start.y+.5)"
+    :x2="get_cell_size()*(end.x+.5)"
+    :y2="get_cell_size()*(end.y+.5)"
   ></line>
 </svg>
 `
 });
 
-*/

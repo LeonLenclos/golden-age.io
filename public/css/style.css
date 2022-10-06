@@ -2,6 +2,7 @@
   --cell-size : 32px;
   --border-radius : 5px;
   --aside-width : 300px;
+  --header-height : 120px;
   /* Palette https://lospec.com/palette-list/japanese-woodblock */
   /* Maybe try : https://lospec.com/palette-list/vanilla-milkshake */
   --iron :  #b1a58d ;
@@ -58,6 +59,7 @@ button {
   border:none;
   padding: 1px 3px;
   margin:2px;
+  background: var(--iron);
 }
 
 button[disabled]>*{
@@ -68,6 +70,7 @@ button[disabled]>*{
 /********* MACRO ***********/
 #app {
   width:100%;
+  height: 100%;
   min-width:800px;
   min-height:600px;
   display: flex;
@@ -76,6 +79,7 @@ button[disabled]>*{
 
 #app>main{
   display: flex;
+  justify-content: center;
 }
 
 #app>main>aside{
@@ -89,21 +93,18 @@ button[disabled]>*{
 }
 
 #app>main>#map{
-  flex-grow: 1;
 }
 
 /********* MAP **************/
 
 #map {
+  position: relative;
   background: var(--water);
-  border-radius: var(--border-radius);
-  overflow: hidden;
   margin:2px;
 }
 
 #map table {
  border-collapse: collapse;
- margin:6px auto;
 }
 
 #map td {
@@ -118,8 +119,6 @@ button[disabled]>*{
   pointer-events:none;
 }
 
-
-
 .cell {
   background:var(--dark-water);
   width:var(--cell-size);
@@ -128,8 +127,7 @@ button[disabled]>*{
 
 
 /**** OBSOLETE ****/
-.cell.select:hover:after,
-.cell.target:hover:after {
+.cell.select:hover:after {
   content:'';
   width: var(--cell-size);
   height: var(--cell-size);
@@ -140,9 +138,6 @@ button[disabled]>*{
     background: url('../assets/gui/select.png');
 }
 
-.cell.target:hover:after{
-  /*    background: url('../assets/gui/target.png');*/
-}
 
 
 /*******/
@@ -187,19 +182,19 @@ button[disabled]>*{
 }
 
 .cell .movingfromleft {
-  --left-offset:-32px;
+  --left-offset:calc(-1 * var(--cell-size));
 }
 
 .cell .movingfromright {
-  --left-offset:32px;
+  --left-offset:var(--cell-size);
 }
 
 .cell .movingfromtop {
-  --top-offset: -32px;
+  --top-offset: calc(-1 * var(--cell-size));
 }
 
 .cell .movingfrombottom{
-  --top-offset: 32px;
+  --top-offset: var(--cell-size);
 }
 
 
@@ -231,20 +226,22 @@ button[disabled]>*{
 }
 
 
-#join-room div {
+#join-room>div {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 15px;
 }
-#join-room div>* {
+#join-room>div>* {
   margin:5px;
 }
+
 #loading .fill-bar {
   max-width: 500px;
 }
 
 
+
+/********* GAME INTERFACE *******/
 
 .playername, .entityname{
   display: inline-block;
@@ -253,7 +250,7 @@ button[disabled]>*{
 
 
 .panel{
-  background: lightgrey;
+  background: var(--silver);
   display: flex;
   flex-direction: column;
   
@@ -262,25 +259,6 @@ button[disabled]>*{
   border-radius: 5px;
   margin:2px;
 
-}
-
-.panel > header{
-  display: flex;
-  flex-direction: row;
-  border-bottom:1px solid white;
-  height: 20px;
-}
-
-.panel > header h2, .panelcol > header h2{
-  margin: 0;
-  padding: 0 4px;
-  font-size: inherit;
-  flex-grow: 1;
-  overflow: hidden;
-}
-
-.panel > header button {
-  width:20px;
 }
 
 .panel > main {
@@ -316,9 +294,9 @@ button[disabled]>*{
   flex-wrap: nowrap;
     min-height:24px;
   margin:0;
-  border:1px solid #888;
+  border:1px solid var(--black);
   border-radius:4px;
-    overflow:hidden;
+  overflow: hidden;
 }
 
 .panel#messages form * {
@@ -329,7 +307,7 @@ button[disabled]>*{
 
 .panel#messages form input{
   flex-grow: 1;
-    border-right:1px solid #888;
+    border-right:1px solid var(--black);
 
 }
 
@@ -377,20 +355,11 @@ button[disabled]>*{
   
 }
 
-.old-tableee {
-    width: 100%;
-   overflow-wrap: break-word;
-  table-layout: fixed;
-   border-collapse: collapse;
-  margin: 8px auto;
-}
-
-
 
 .fill-bar {
 
   position: relative;
-  background: #888;
+  background: var(--iron);
   width: 100%;
     height: 24px;
     border-radius: 4px;
@@ -433,24 +402,27 @@ button[disabled]>*{
 #room {
   display: flex;
   flex-direction: column;
+  height: var(--header-heigth);
 }
 
-#room header{
-  background: lightgray;
+
+#room>header{
+  background: var(--silver);
   display: flex;
       border-radius: 5px;
   align-items: center;
   margin:2px;
+  flex-grow: 1;
 
 }
 
-#room header h2{
+#room>header h2{
   flex-grow: 1;
   margin: 0 5px
 }
 
 .roomstate {
-    background: lightgray;
+    background: var(--silver);
   display: flex;
       border-radius: 5px;
   margin:2px;
@@ -474,7 +446,7 @@ section.players{
 }
 .playercard {
   padding: 3px;
-  background: #ddd;
+  background: var(--silver);
   width: 50%;
   border-radius: 5px;
   margin:2px;
@@ -544,7 +516,7 @@ section.players{
 }
 
 
-svg{
+svg.entity{
   width:var(--cell-size);
   height:var(--cell-size);
   display:inline;

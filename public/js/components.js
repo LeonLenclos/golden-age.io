@@ -356,6 +356,7 @@ Vue.component('main-map', {
     'players',
     'world',
     'selection',
+    'cell_size'
   ],
   watch:{
     entities(new_entities){
@@ -463,53 +464,12 @@ Vue.component('main-map', {
     :start="get_selected().pos"
     :end="hover_pos"
     :size="world.size"
-
+    :cell_size="cell_size"
   ></arrow>
   </div>
   `
 });
 
-
-Vue.component('arrow', {
-  data(){
-    return{
-      cell_size:33,
-    };
-  },
-  props:['start', 'end', 'size'],
-  methods:{
-    get_width(){return this.cell_size*(this.size.x+1)},
-    get_height(){return this.cell_size*(this.size.y+1)},
-    get_view_box(){
-      return `0 0 ${this.get_width()} ${this.get_height()}`;
-    }
-  },
-  template:`
-<svg
-  class="arrow"
-  xmlns="http://www.w3.org/2000/svg"
-  :viewBox="get_view_box()"
-  :width="get_width()"
-  :height="get_height()"
-  >
-  <defs>
-      <marker id="arrow-head" viewBox="0 0 20 20" refX="10" refY="10" markerWidth="10" markerHeight="10" shape-rendering="crispEdges" orient="auto-start-reverse" fill="white">
-        <path d="M 0 0 L 20 10 L 0 20 z" />
-      </marker>
-  </defs>
-  <line
-    id='arrow-line'
-    marker-end='url(#arrow-head)'
-    stroke-width='1'
-    fill='none' stroke='white'
-    :x1="cell_size*(start.x+.5)"
-    :y1="cell_size*(start.y+.5)"
-    :x2="cell_size*(end.x+.5)"
-    :y2="cell_size*(end.y+.5)"
-  ></line>
-</svg>
-`
-});
 
 
 Vue.component('entity-img', {

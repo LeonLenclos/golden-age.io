@@ -11,7 +11,8 @@ var app = new Vue({
     messages:[],
     room:undefined,
     sounds:{},
-    loading:0
+    loading:0,
+    cell_size:undefined,
   },
   mounted: function () {
     document.addEventListener('keyup', (e)=>{return this.on_keyup(e)});
@@ -53,14 +54,22 @@ var app = new Vue({
   },
   methods: {
     on_resize(){
-      let width = this.$el.clientWidth;
-      let height = this.$el.clientHeight;
       let root = document.documentElement
-      let aside_width = parseInt(getComputedStyle(root).getPropertyValue('--aside-width'));
-      let margin = 40;//px
+      let map_margin = 2;//px
+
+      let width = this.$el.clientWidth;
       let world_width =  20;//cells
-      let cell_size = (width-margin-aside_width*2)/ world_width;
-      root.style.setProperty('--cell-size', `${cell_size}px`); 
+      let aside_width = parseInt(getComputedStyle(root).getPropertyValue('--aside-width'));
+      let remaining_width = width-aside_width*2-map_margin*2;
+
+      let height = this.$el.clientHeight;
+      let world_height =  15;//cells
+      let header_height = parseInt(getComputedStyle(root).getPropertyValue('--header-height'));
+      let remaining_height = height-header_height-map_margin;
+
+      this.cell_size = Math.min(remaining_width/world_width, remaining_height/world_height);
+      this.cell_size -= 1;
+      root.style.setProperty('--cell-size', `${this.cell_size}px`);
     },
     start(){
       this.started=true;
