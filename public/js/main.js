@@ -40,7 +40,7 @@ var app = new Vue({
         let visibles_events = this.filter_visible(new_room.world.events);
         ['kill', 'new'].forEach(type=>{
           ['unit', 'gold', 'building'].forEach(secondary_type=>{
-            let count = visibles_events.filter((e)=>e.type == type && e.secondary_type == secondary_type).length;
+            let count = visibles_events.filter((e)=>e.active && e.type == type && e.secondary_type == secondary_type).length;
             if(count > 0){
               this.play_sound(`${type}-${secondary_type}`);
             }

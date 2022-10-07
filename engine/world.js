@@ -94,7 +94,7 @@ export class World {
   get_state(){
     return {
       size:this.size,
-      entities:this.entities.map((e)=>e.get_state()),
+      entities:this.entities.filter(e=>e.hp>0).map(e=>e.get_state()),
       events:this.events.map((e)=>e.get_state())
     };
   }

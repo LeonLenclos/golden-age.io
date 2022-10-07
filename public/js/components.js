@@ -48,14 +48,12 @@ Vue.component('player-name', {
   props: ['player'],
   template: `
     <span
-      v-if="player"
-      class="playername"
-      :title="player.id"
-      :style="'color:'+player.color"
-      >
-      {{player.name}}
-    </span>
-    <span v-else class="playername">???</span>
+      :class="{
+        playername:true,
+        ally:player.id==$root.id,
+        enemy:player.id!=$root.id,
+      }"
+    > {{player.name}} </span>
   `
 });
 
@@ -65,13 +63,12 @@ Vue.component('entity-name', {
   template: `
     <span
       v-if="entity"
-      class="entityname"
-      :title="entity.id"
-      :style="'color:'+$root.who_is(entity.owner)?.color||'inherit'"
-      >
-      {{entity.type}}
-    </span>
-    <span v-else class="entityname">???</span>
+      :class="{
+        entityname:true,
+        ally:entity.owner==$root.id,
+        enemy:entity.owner!=$root.id,
+      }"
+    > {{entity.type}} </span>
   `
 });
 
@@ -93,7 +90,6 @@ Vue.component('room', {
       <player-card
         v-for="player in room.players"
         :player="player"
-        :is_you="player.id==$root.id"
         ></player-card>
       </section>
   </div>
@@ -117,7 +113,6 @@ Vue.component('fill-bar', {
       <div class="label">{{get_text()}}</div>
     </div>
     `
-
 });
 
 Vue.component('entity-card', {
@@ -126,7 +121,7 @@ Vue.component('entity-card', {
   <div class="card">
     <header>
       <h2><entity-name :entity=entity ></entity-name></h2>
-      <entity-img :entity=entity :basic_sprite="true"></entity-img>
+      <entity :entity="entity" :basic_sprite="true"></entity>
     </header>
     <main>
       <small>{{entity.pos.x}}, {{entity.pos.y}}</small>
@@ -139,18 +134,34 @@ Vue.component('entity-card', {
 });
 
 Vue.component('creation-card', {
-  props: ['mission'],
+  props: ['creation','index'],
+  methods:{
+    entity()
+    {
+      return {type:this.creation.type, owner:this.$root.id};
+    },
+    hint(){
+      console.log(this.creation)
+      const hints = {
+        gold:'Can be mined for gold',
+        unit:'Can mine, fight and build',
+        house:'Can create units',
+        factory:'Can create gold mines',
+      }
+      return hints[this.creation.type];
+    }
+  },
   template: `
-  <div class="card">
-    <header>
-      <h2>{{mission.type}}</h2>
-      <action-img :action=mission.type></action-img>
-    </header>
-    <main>
-      <fill-bar :value="mission.progress" :max="1" :percent="true"></fill-bar>
-        <small>{{mission.status}}<span v-if=mission.status_details> ({{mission.status_details}})</span></small>
-    </main>
-  </div>
+  <button
+  :disabled="!creation.possible"
+  @click="$emit('click')"
+  >
+    <h2><entity-name :entity="entity()"></entity-name></h2>
+    <small>{{hint()}}</small>
+    <entity :entity="entity()"></entity>
+    <div class="gold-value">{{creation.cost}}</div>
+    <span class="shortcut">{{['A or Q', 'Z or W'][index]}}</span>
+  </button>
   `
 });
 
@@ -161,7 +172,7 @@ Vue.component('player-card', {
 
   <div class="playercard">
     <header>
-      <h2><player-name :player=player></player-name><span v-if="is_you"> (you)</span></h2>      
+      <h2><player-name :player=player></player-name></h2>      
     </header>
     <main>
       <fill-bar class="gold-bar" :value="player.gold" :max="player.gold_max"></fill-bar>
@@ -185,10 +196,6 @@ Vue.component('inspector', {
   </div>
   `
 });
-
-
-
-
 
 Vue.component('panel-col',{
     props:['title'],
@@ -217,16 +224,12 @@ Vue.component('selection', {
 
     <panel-col title="creations">
       <div class="creations">
-      <button
-        v-for="(crea, i) in creations"
-        :disabled="!crea.possible"
-        @click="$emit('creation', crea.type)"
-        >
-          <entity-img :entity=crea></entity-img>
-          <div class="gold-value">{{crea.cost}}</div>
-          <span class="shortcut">{{['A or Q', 'Z or W'][i]}}</span>
-        </button>
-
+      <creation-card
+        v-for="(creation, i) in creations"
+        @click="$emit('creation', creation.type)"
+        :creation=creation
+        :index=i
+      ></creation-card>
       </div>
     </panel-col>
 
@@ -234,7 +237,6 @@ Vue.component('selection', {
   `
 });
 
-// entity-img
 Vue.component('join-room', {
   data:function(){return {
     player:readCookie('playername')||'',
@@ -271,7 +273,6 @@ Vue.component('join-room', {
     `
 });
 
-// entity-img
 Vue.component('loading', {
 
   props:['progress'],
@@ -319,7 +320,8 @@ Vue.component('end', {
           draw:  "You both conceded at the same time.",
         },
       }
-      console.log(this.reason, this.status, sentences[this.reason][this.status]);
+      console.log(this.reason, this.status);
+      console.log(sentences[this.reason][this.status]);
       return sentences[this.reason][this.status];
     },
     get_status(){
@@ -353,6 +355,7 @@ Vue.component('main-map', {
   },
   props: [
     'entities',
+    'events',
     'players',
     'world',
     'selection',
@@ -370,6 +373,9 @@ Vue.component('main-map', {
     },
     entities_at(pos){
       return this.entities.filter(e=>e.pos.x==pos.x && e.pos.y==pos.y);
+    },
+    events_at(pos){
+      return this.events.filter(e=>e.active && e.pos.x==pos.x && e.pos.y==pos.y);
     },
     allies_at(pos){
       return this.allies.filter(e=>e.pos.x==pos.x && e.pos.y==pos.y);
@@ -454,6 +460,7 @@ Vue.component('main-map', {
             :visible="is_visible({x,y})"
             :pos="{x,y}"
             :entities="entities_at({x,y})"
+            :events="events_at({x,y})"
           ></cell>
         </td>
       </tr>
@@ -470,63 +477,11 @@ Vue.component('main-map', {
   `
 });
 
-
-
-Vue.component('entity-img', {
-  props: [
-    'entity',
-    'selected',
-    'basic_sprite',
-  ],
-  methods:{
-    get_src(){
-      let owner = this.$root.who_is(this.entity.owner)
-      let color = owner?.color || 'white';
-      let name = this.entity.type;
-      if (this.entity.sprite && !this.basic_sprite){
-        name = `${this.entity.sprite}${this.$root.room.turn%2}`;
-      }
-      if (this.entity.under_construction){
-        name = 'worksite';
-      }
-      return `assets/sprites/${color}/${name}.png`
-    },
-    moving_from(x, y){
-      if(!this.entity.prev_pos) return false;
-      return this.entity.prev_pos.x - this.entity.pos.x == x
-          && this.entity.prev_pos.y - this.entity.pos.y == y;
-    }
-  },
-  template: `
-      <img
-        :class="{
-          selected:selected,
-          movingfromleft:moving_from(-1, 0),
-          movingfromright:moving_from(1, 0),
-          movingfromtop:moving_from(0, -1),
-          movingfrombottom:moving_from(0, 1)
-        }"
-        :src="get_src()"
-      >
-      `
-});
-
-Vue.component('action-img',{
-  props: ['action'],
-  methods:{
-    get_src(){
-      return `assets/actions/${this.action}.png`;
-    }
-  },
-  template: `
-<img :src="get_src()"></img>
-  `
-});
-
 Vue.component('cell', {
   props: [
     'pos',
     'entities',
+    'events',
     'visible'
   ],
   methods:{
@@ -548,16 +503,23 @@ Vue.component('cell', {
 
 
     <entity
-    v-if=visible
-    v-for="entity in entities?.sort(sorting)"
-    :entity=entity
-    :turn=$root.room.turn
-    draggable="false"
+      v-if=visible
+      v-for="entity in entities?.sort(sorting)"
+      :entity=entity
+      :turn=$root.room.turn
+      :selected="is_selected(entity)"
+      draggable="false"
     />
-    <action-img
-      v-if="is_inspected() && this.$root.mission_selected"
-      :action="this.$root.mission_selected"
-      ></action-img>
+
+
+    <event
+      v-if=visible
+      v-for="event in events"
+      :event=event
+      :turn=$root.room.turn
+      draggable="false"
+    />
+
   </div>
     `
 });

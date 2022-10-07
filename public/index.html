@@ -45,6 +45,7 @@
         :players="room?.players"
         :world="room?.world"
         :entities="filter_visible(room?.world.entities)"
+        :events="filter_visible(room?.world.events)"
         :selection=selection
         :cell_size="cell_size"
         @inspect=inspect
