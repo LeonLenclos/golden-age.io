@@ -4,6 +4,9 @@ import {
   Building,
 } from './entity.js';
 
+
+const CRITICAL_CREATE_PROB = .2
+
 export class Action {
 
   static type = 'action'
@@ -153,7 +156,7 @@ export class Repair extends Action {
   }
 
   do(){
-    this.get_building().hp ++;
+    this.get_building().heal(1);
     this.entity.set_sprite('build');
   }
 
@@ -235,10 +238,15 @@ export class Create extends Action {
       return;
     }
 
-    if(!this.entity.get_resident()) return;
+    let points = 1;
+    this.entity.set_sprite('create');
+    if(this.entity.get_resident() && Math.random()<CRITICAL_CREATE_PROB){
+      this.entity.set_sprite('critical-create');
+      points++;
+    }
 
     if(this.entity.creation.under_construction){
-      this.entity.creation.hp ++;
+      this.entity.creation.heal(points);
       this.entity.creation.update();
     }
 

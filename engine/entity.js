@@ -55,6 +55,11 @@ export class Entity {
     return this.hp>0;
   }
 
+  heal(points){
+    this.hp = Math.min(this.hp_max ,this.hp+points);
+    return this.hp;
+  }
+
   hit(damage){
     let new_hp = Math.max(0,this.hp-damage);
     this.hp = new_hp
@@ -197,7 +202,7 @@ export class Building extends Entity {
 
 
   can_create(constructor){
-    return super.can_create(constructor) && Boolean(this.get_resident());
+    return super.can_create(constructor);
 
   }
 
