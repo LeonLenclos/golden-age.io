@@ -8,6 +8,7 @@
   --iron :  #b1a58d ;
   --silver : #e3cfb4;
   --black : #2b2821 ;
+  --white : #fff ;
   --gold :  #e0c872 ;
   --dark-gold :  #d4804d;
   --sand :  #d9ac8b;
@@ -57,6 +58,7 @@ h1 {
 
 button {
   border:none;
+  color: var(--black);
   padding: 1px 3px;
   margin:2px;
   background: var(--iron);
@@ -556,5 +558,10 @@ path[data-color="iron"]{
 
 path[data-color="gold"]{
   fill:var(--gold);
+}
+
+path[data-color="white"]{
+  fill:var(--white);
+  stroke:var(--white);
 }
 

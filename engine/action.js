@@ -118,11 +118,12 @@ export class Attack extends Action {
   do(){
     let enemy = this.get_enemy();
     let damage = 1;
+    this.entity.set_sprite(this.constructor.type);
     if(Math.random()<this.entity.get_force()){
+    this.entity.set_sprite(`critical-${this.constructor.type}`);
       damage++;
     }
     enemy.hit(damage);
-    this.entity.set_sprite('attack');
   }
 }
 
@@ -135,13 +136,6 @@ export class Defend extends Attack {
     let enemy = this.get_enemy()
     return enemy && enemy.id > this.entity.id;
   }
-
-  do(){
-    super.do();
-    this.entity.set_sprite('defend');
-
-  }
-
 }
 
 export class Repair extends Action {

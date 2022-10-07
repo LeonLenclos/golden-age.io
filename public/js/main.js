@@ -25,10 +25,16 @@ var app = new Vue({
       if(new_room.turn != old_room.turn){
         this.play_sound_once('theme', 0);
         let visibles_entitites = this.filter_visible(new_room.world.entities);
-        ['mine', 'build', 'attack', 'critical'].forEach(action=>{
+        ['mine', 'build', 'attack', 'defend'].forEach(action=>{
           let count = visibles_entitites.filter((e)=>e.sprite == action).length;
           if(count > 0){
             this.play_sound(`action-${action}`, 3, Math.min(count-1, 2));
+          }
+        });
+        ['critical-attack', 'critical-defend'].forEach(action=>{
+          let some = visibles_entitites.some((e)=>e.sprite == action);
+          if(some){
+            this.play_sound(`${action}`, 2);
           }
         });
         let visibles_events = this.filter_visible(new_room.world.events);

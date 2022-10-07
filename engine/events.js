@@ -29,5 +29,5 @@ export class Kill extends Event {
 }
 
 export class New extends Event {
-    static type = 'kill';
+    static type = 'new';
 }

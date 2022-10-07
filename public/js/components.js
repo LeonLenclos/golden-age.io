@@ -551,6 +551,7 @@ Vue.component('cell', {
     v-if=visible
     v-for="entity in entities?.sort(sorting)"
     :entity=entity
+    :turn=$root.room.turn
     draggable="false"
     />
     <action-img
