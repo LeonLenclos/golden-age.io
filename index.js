@@ -29,6 +29,24 @@ function send_message(room, msg, emiter){
   io.to(room.id).emit('msg', msg, emiter);
 }
 
+function cheat(player, msg){
+  switch (msg) {
+    case '!FREEGOLD':
+      player.gold += 100;
+      break;
+    case '!NOFOG':
+      player.room.fog_of_war = false;
+      break;
+    case '!STOPTIME':
+      player.room.turn_increment = 0;
+      break;
+    default:
+      return false;
+  }
+  send_message(player.room, `${player.name} is cheating !`)
+  return true;
+}
+
 io.on('connection', (socket) => {
 
   console.log('connection', socket.id)
@@ -62,6 +80,7 @@ io.on('connection', (socket) => {
   socket.on('msg', (msg) => {
     let player = get_player(socket.id);
     if(!player) return;
+    if(cheat(player, msg)) return;
     send_message(player.room, msg, player.id);
   });
 

@@ -384,7 +384,7 @@ Vue.component('main-map', {
       return this.allies.some(e=>e.pos.x==pos.x && e.pos.y==pos.y);
     },
     is_visible(pos){
-      if(this.$root.room.playing=='ended') return true;
+      if(!this.$root.room.fog_of_war) return true;
       return this.allies.some(e=>Math.abs(pos.x-e.pos.x)+Math.abs(pos.y-e.pos.y)<4);
     },
 

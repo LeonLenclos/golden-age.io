@@ -196,7 +196,7 @@ var app = new Vue({
     filter_visible(objects){
       objects = objects || this.room?.world.entities;
       if(objects == undefined) return [];
-      if(this.room.playing == 'ended') return objects;
+      if(!this.room.fog_of_war) return objects;
       if(this.room.playing != 'playing') return [];
       let allies = this.room.world.entities.filter(e=>e.owner==this.id)
       return objects.filter(e=>{

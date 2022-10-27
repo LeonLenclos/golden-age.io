@@ -38,6 +38,8 @@ export class Room {
     this.turn = START_COUNTDOWN;
     this.turn_max = TURN_MAX;
     this.playing = NOT_STARTED;
+    this.fog_of_war = true;
+    this.turn_increment = 1;
     
     this.turn_interval_id = setInterval(()=>{this.update()}, TURN_INTERVAL_TIME)
     rooms.push(this);
@@ -60,8 +62,7 @@ export class Room {
   }
 
   remove_player(player){
-    this.players = this.players.filter(p=>p.id!=player.id);
-    this.set_playing(ENDED);
+    player.concede=true;
   }
 
   start(){
@@ -108,6 +109,7 @@ export class Room {
     }
     if(victory){
       this.set_playing(ENDED);
+      this.fog_of_war = false;
       this.players.forEach(p=>{p.set_victory(
         (winner == p ? WIN : winner ? LOOSE : DRAW), victory
       )});
@@ -118,7 +120,7 @@ export class Room {
 
   update(){
     if(this.playing == PLAYING){
-      this.turn ++;
+      this.turn += this.turn_increment;
       this.world.update();
       this.victory_condition();      
       this.emit('turn', this.get_state());
@@ -142,6 +144,7 @@ export class Room {
       turn:this.turn,
       turn_max:this.turn_max,
       players:this.players.map(p=>p.get_state()),
+      fog_of_war:this.fog_of_war,
     };
   }
 
