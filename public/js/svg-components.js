@@ -271,42 +271,103 @@ Vue.component('event', {
     `
 });
 
-Vue.component('arrow', {
-  data(){
-    return{
-    };
-  },
-  props:['start', 'end', 'size', 'cell_size'],
-  methods:{
-    get_width(){return this.get_cell_size()*(this.size.x+1)},
-    get_height(){return this.get_cell_size()*(this.size.y+1)},
-    get_cell_size(){return this.cell_size+1},
-    get_view_box(){return `0 0 ${this.get_width()} ${this.get_height()}`},
-  },
-  template:`
-<svg
-  class="arrow"
-  xmlns="http://www.w3.org/2000/svg"
-  :viewBox="get_view_box()"
-  :width="get_width()"
-  :height="get_height()"
-  >
-  <defs>
-      <marker id="arrow-head" viewBox="0 0 20 20" refX="10" refY="10" markerWidth="10" markerHeight="10" shape-rendering="crispEdges" orient="auto-start-reverse" fill="white">
-        <path d="M 0 0 L 20 10 L 0 20 z" />
-      </marker>
-  </defs>
-  <line
-    id='arrow-line'
-    marker-end='url(#arrow-head)'
-    stroke-width='1'
-    fill='none' stroke='white'
-    :x1="get_cell_size()*(start.x+.5)"
-    :y1="get_cell_size()*(start.y+.5)"
-    :x2="get_cell_size()*(end.x+.5)"
-    :y2="get_cell_size()*(end.y+.5)"
-  ></line>
-</svg>
-`
-});
 
+
+Vue.component('arrow', {
+    data(){
+      return{
+      };
+    },
+    props:['start', 'end', 'size', 'cell_size'],
+    methods:{
+      get_width(){return this.get_cell_size()*(this.size.x+1)},
+      get_height(){return this.get_cell_size()*(this.size.y+1)},
+      get_cell_size(){return this.cell_size+1},
+      get_view_box(){return `0 0 ${this.get_width()} ${this.get_height()}`},
+    },
+    template:`
+  <svg
+    class="arrow"
+    xmlns="http://www.w3.org/2000/svg"
+    :viewBox="get_view_box()"
+    :width="get_width()"
+    :height="get_height()"
+    >
+    <defs>
+        <marker id="arrow-head" viewBox="0 0 20 20" refX="10" refY="10" markerWidth="10" markerHeight="10" shape-rendering="crispEdges" orient="auto-start-reverse" fill="white">
+          <path d="M 0 0 L 20 10 L 0 20 z" />
+        </marker>
+    </defs>
+    <line
+      id='arrow-line'
+      marker-end='url(#arrow-head)'
+      stroke-width='1'
+      fill='none' stroke='white'
+      :x1="get_cell_size()*(start.x+.5)"
+      :y1="get_cell_size()*(start.y+.5)"
+      :x2="get_cell_size()*(end.x+.5)"
+      :y2="get_cell_size()*(end.y+.5)"
+    ></line>
+  </svg>
+  `
+  });
+  
+
+  
+Vue.component('arrow-path', {
+    data(){
+      return{
+      };
+    },
+    props:['start', 'path', 'size', 'cell_size'],
+    methods:{
+        get_steps(){
+            let steps = [];
+            if(!this.path?.length) return;
+            steps.push({
+                start:this.start,
+                end:this.path[0],
+            })
+            for (let i = 1; i < this.path.length; i++) {
+                steps.push({
+                    start:this.path[i-1],
+                    end:this.path[i],
+                });
+            }
+            steps[steps.length-1].last = true;
+            return steps;
+        },
+        get_width(){return this.get_cell_size()*(this.size.x+1)},
+        get_height(){return this.get_cell_size()*(this.size.y+1)},
+        get_cell_size(){return this.cell_size+1},
+        get_view_box(){return `0 0 ${this.get_width()} ${this.get_height()}`},  
+    },
+    template:`
+        <svg
+        class="arrow-path"
+        xmlns="http://www.w3.org/2000/svg"
+        :viewBox="get_view_box()"
+        :width="get_width()"
+        :height="get_height()"
+        >
+        <defs>
+            <marker id="arrow-path-head" viewBox="0 0 20 20" refX="10" refY="10" markerWidth="10" markerHeight="10" shape-rendering="crispEdges" orient="auto-start-reverse" fill="white">
+            <path d="M 0 0 L 20 10 L 0 20 z" />
+            </marker>
+        </defs>
+        <line
+        v-for="step in get_steps()"
+        id='arrow-line'
+        :marker-end="step.last ? 'url(#arrow-path-head)' : undefined"
+        stroke-width='1'
+        fill='none' stroke='white'
+        :x1="get_cell_size()*(step.start.x+.5)"
+        :y1="get_cell_size()*(step.start.y+.5)"
+        :x2="get_cell_size()*(step.end.x+.5)"
+        :y2="get_cell_size()*(step.end.y+.5)"
+        ></line>
+    </svg>
+   `
+  });
+  
+  

@@ -466,6 +466,14 @@ Vue.component('main-map', {
       </tr>
     </table>
 
+
+    <arrow-path
+      v-for="unit in this.allies.filter(a=>a.type=='unit')"
+      :start="unit.pos"
+      :path="unit.path"
+      :size="world.size"
+      :cell_size="cell_size"  
+    ></arrow-path>
     <arrow
     v-if="is_targetable(hover_pos)"
     :start="get_selected().pos"
@@ -473,6 +481,8 @@ Vue.component('main-map', {
     :size="world.size"
     :cell_size="cell_size"
   ></arrow>
+
+
   </div>
   `
 });

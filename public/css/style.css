@@ -112,13 +112,20 @@ button[disabled]>*{
   border:1px solid var(--water);
 }
 
-#map .arrow{
+#map .arrow,
+#map .arrow-path{
   position: absolute;
   top:0;
   left:0;
   pointer-events:none;
 }
 
+#map .arrow-path {
+}
+#map .arrow-path * {
+  stroke:var(--red);
+   fill:var(--red);
+}
 .cell {
   background:var(--dark-water);
   width:var(--cell-size);

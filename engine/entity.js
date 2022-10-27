@@ -185,6 +185,12 @@ export class Unit extends Entity {
   can_create(constructor){
     return super.can_create(constructor) &&  this.world.get_entities_at(this.pos).length == 1;
   }
+
+  get_state(){
+    let state = super.get_state();
+    state.path = this.path;
+    return state;
+  }
 }
 
 
