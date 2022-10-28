@@ -1,6 +1,7 @@
 import urid from 'urid';
 import {World} from './world.js';
 import {Entity, Unit} from './entity.js';
+import { Bot } from './player.js';
 
 const TURN_INTERVAL_TIME = 1250; //ms
 const DEFAULT_ROOM_NAME = 'somewhere';
@@ -27,6 +28,14 @@ export function get_room(name, io) {
   let room = rooms.filter((r)=>r.is_free()).find((r)=>r.name == name);
   return room || new Room(name, io);
 }
+
+export function close_room(id) {
+  console.log('CLOSE ROOM', id)
+  let room = rooms.find(r=>r.id == id);
+  clearInterval(room.turn_interval_id);
+  rooms = rooms.filter(r=>r.id != id);
+}
+
 
 export class Room {
   constructor(name, io) {
@@ -62,7 +71,7 @@ export class Room {
   }
 
   remove_player(player){
-    player.concede=true;
+    this.players = this.players.filter(p=> p.id != player.id);
   }
 
   start(){
@@ -81,32 +90,44 @@ export class Room {
     this.players.push(player);
   }
 
+  add_bot(difficulty){
+    if(this.players.length > 1) return;
+    this.add_player(new Bot(difficulty));
+  }
+
   victory_condition(){
     let winner = undefined;
     let victory = undefined;
-    let p1 = this.players[0];
-    let p2 = this.players[1];
-    if (this.turn >= this.turn_max){
-      if (p1.gold > p2.gold) winner = p1;
-      if (p2.gold > p1.gold) winner = p2;
-      victory = TIMESOUT;
-    }
-    if (this.players.find(p=>p.gold>=p.gold_max)){
-      if (p1.gold > p2.gold) winner = p1;
-      if (p2.gold > p1.gold) winner = p2;
-      victory = ECONOMIC
-    }
-    const units_length = p => this.world.entities.filter(e=>e instanceof Unit && p.own(e)).length; 
-    if (this.players.find(p=>units_length(p)==0)){
-      if (units_length(p1) > units_length(p2)) winner = p1;
-      if (units_length(p2) > units_length(p1)) winner = p2;
-      victory = MILITARY;
-    }
-    if (this.players.find(p=>p.concede)){
-      if (p2.concede && ! p1.concede) winner = p1;
-      if (p1.concede && ! p2.concede) winner = p2;
+    if(this.players.length == 1){
+      winner = this.players[0];
       victory = CONCEDE;
     }
+    else {
+      let p1 = this.players[0];
+      let p2 = this.players[1];
+      if (this.turn >= this.turn_max){
+        if (p1.gold > p2.gold) winner = p1;
+        if (p2.gold > p1.gold) winner = p2;
+        victory = TIMESOUT;
+      }
+      if (this.players.find(p=>p.gold>=p.gold_max)){
+        if (p1.gold > p2.gold) winner = p1;
+        if (p2.gold > p1.gold) winner = p2;
+        victory = ECONOMIC
+      }
+      const units_length = p => this.world.entities.filter(e=>e instanceof Unit && p.own(e)).length; 
+      if (this.players.find(p=>units_length(p)==0)){
+        if (units_length(p1) > units_length(p2)) winner = p1;
+        if (units_length(p2) > units_length(p1)) winner = p2;
+        victory = MILITARY;
+      }
+      if (this.players.find(p=>p.concede)){
+        if (p2.concede && ! p1.concede) winner = p1;
+        if (p1.concede && ! p2.concede) winner = p2;
+        victory = CONCEDE;
+      }
+    }
+
     if(victory){
       this.set_playing(ENDED);
       this.fog_of_war = false;
@@ -119,6 +140,11 @@ export class Room {
   }
 
   update(){
+    if(this.players.filter(p=>!(p instanceof Bot)).length == 0){
+      close_room(this.id);
+      return;
+    }
+    this.players.forEach(player=>player.update());
     if(this.playing == PLAYING){
       this.turn += this.turn_increment;
       this.world.update();

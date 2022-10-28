@@ -143,6 +143,9 @@ var app = new Vue({
     send_message(msg){
       socket.emit('msg', msg);
     },
+    bot(difficulty){
+      socket.emit('bot', difficulty);
+    },
     receive_message(msg, emiter){
       this.messages.push({msg:msg, emiter:emiter});
       this.play_sound('ui-chat', 3);

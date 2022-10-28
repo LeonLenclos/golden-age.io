@@ -334,13 +334,26 @@ Vue.component('end', {
     }
   },
   template: `
-  <div class="panel" title="inspector" id="inspector">
+  <div class="panel" title="end" id="end">
     <small>{{get_reason()}}</small>
     <h2>{{get_status()}}</h2>
   </div>
   `
 
 });
+
+Vue.component('waiting', {
+  template: `
+  <div class="panel" title="waiting" id="waiting">
+    <h2>Waiting for a player...</h2>
+    <small>Tired to wait ? Invite a bot :</small>
+    <button @click="$emit('bot', 'hard')">Invite hard bot</button>
+    <button @click="$emit('bot', 'medium')">Invite medium bot</button>
+    <button @click="$emit('bot', 'easy')">Invite easy bot</button>
+  </div>
+  `
+});
+
 
 Vue.component('main-map', {
   data(){

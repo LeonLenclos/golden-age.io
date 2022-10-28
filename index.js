@@ -40,6 +40,10 @@ function cheat(player, msg){
     case '!STOPTIME':
       player.room.turn_increment = 0;
       break;
+    case '!':
+      player.room.fog_of_war = false;
+      player.room.add_bot();
+      break;
     default:
       return false;
   }
@@ -82,6 +86,12 @@ io.on('connection', (socket) => {
     if(!player) return;
     if(cheat(player, msg)) return;
     send_message(player.room, msg, player.id);
+  });
+
+  socket.on('bot', (difficulty) => {
+    let player = get_player(socket.id);
+    if(!player) return;
+    player.room.add_bot(difficulty)
   });
 
   socket.on('quit', () => {

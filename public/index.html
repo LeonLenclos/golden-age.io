@@ -75,6 +75,10 @@
           :status="who_is(id).victory.status"
           :reason="who_is(id).victory.reason"
         ></end>
+        <waiting
+        v-else-if="room?.playing=='not started'"
+          @bot="bot"
+        ></waiting>
         <div v-else class="panel"></div>
       </aside>
 
