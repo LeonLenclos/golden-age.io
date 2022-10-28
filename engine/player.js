@@ -141,6 +141,7 @@ export class Bot extends Player {
     const create_till_2_factories = create_till_n_things(2, Factory);
     const create_till_8_units = create_till_n_things(10, Unit);
     const create_till_5_units = create_till_n_things(5, Unit);
+    const create_till_4_units = create_till_n_things(4, Unit);
 
     const random_walk = e => {
       if(!(e instanceof Unit)) return false;
@@ -207,7 +208,7 @@ export class Bot extends Player {
       ];
       break;
       case EASY: priority = [
-        create_till_5_units,
+        create_till_4_units,
         create_gold,
         create_till_1_houses,
         create_till_1_factories,
@@ -219,8 +220,8 @@ export class Bot extends Player {
     
     }
     allies.forEach((e, i)=>{
-      const do_nothing_prob = {hard:.9, medium:.5, easy:.3};
-      if(Math.random() < do_nothing_prob[this.difficulty]) return;
+      const do_nothing_prob = {hard:.9, medium:.5, easy:.1};
+      if(Math.random() > do_nothing_prob[this.difficulty]) return;
       for (const action of priority) {
         if(action(e)) return;
       }
