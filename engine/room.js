@@ -13,7 +13,7 @@ const NOT_STARTED = 'not started';
 const PAUSED = 'paused';
 const ENDED = 'ended';
 
-const TIMESOUT = 'timesout';
+const TIMESUP = 'timesup';
 const ECONOMIC = 'economic';
 const MILITARY = 'military';
 const CONCEDE = 'concede';
@@ -108,7 +108,7 @@ export class Room {
       if (this.turn >= this.turn_max){
         if (p1.gold > p2.gold) winner = p1;
         if (p2.gold > p1.gold) winner = p2;
-        victory = TIMESOUT;
+        victory = TIMESUP;
       }
       if (this.players.find(p=>p.gold>=p.gold_max)){
         if (p1.gold > p2.gold) winner = p1;
