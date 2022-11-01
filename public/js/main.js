@@ -3,9 +3,11 @@ var socket = io();
 var app = new Vue({
   el: '#app',
   data: {
-    started:false,
+    // started:false,
     id:undefined,
+    target_id:undefined,
     selection:undefined,
+    joining:false,
     selection_index: 0,
     inspected_pos:{},
     messages:[],
@@ -15,6 +17,9 @@ var app = new Vue({
     cell_size:undefined,
   },
   mounted: function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    this.target_id = urlParams.get('room')
+    console.log('target id:', this.target_id);
     document.addEventListener('keyup', (e)=>{return this.on_keyup(e)});
     window.addEventListener('resize', (e)=>{this.on_resize(e)});
     this.on_resize();
@@ -77,8 +82,8 @@ var app = new Vue({
       this.cell_size -= 1;
       root.style.setProperty('--cell-size', `${this.cell_size}px`);
     },
-    start(){
-      this.started=true;
+    load_assets(callback){
+      // this.started=true;
       fetch('/assets.json')
       .then(response => response.json())
       .then(assets => {
@@ -101,11 +106,19 @@ var app = new Vue({
     },
     play_sound_once(name, variation, intensity){
       let sound = this.get_sound(name, variation, intensity)
-      if(!sound.playing()) sound.play();
+      if(!sound.playing()) {
+        sound.volume(1);
+        console.log('PLAY ONCE, volume:', sound.volume())
+        sound.play();
+      }
     },
     stop_sound(name, variation, intensity){
       let sound = this.get_sound(name, variation, intensity)
-      if(sound.playing()) sound.fade(1, 0, 1000);
+      let delay = 500;
+      if(sound.playing()){
+        sound.fade(1, 0, delay);
+        setTimeout(()=>sound.stop(), delay);
+      }
     },
     load_sound(name){
       let filename = `assets/audio/${name}.mp3`
@@ -131,14 +144,29 @@ var app = new Vue({
       }
       if(total == 0) return 0;
       this.loading = loaded/total;
+      if(this.loading == 1){
+        this.on_loaded()
+      }
     },
-    join_room(player_name, room_name){
-      socket.emit('join', {player:player_name, room:room_name});
+    join_room(player, private){
+      this.joining = true;
+      this.on_loaded = () =>{
+        let room = this.target_id;
+        socket.emit('join', {player, room, private});
+        history.pushState({room:undefined}, '', '/')      
+        this.target_id=undefined;
+      };
+      if(this.loading < 1) this.load_assets();
+      else this.on_loaded();
     },
     quit_room(){
       socket.emit('quit');
+      this.stop_sound('theme', 0);
       this.room = undefined;
       this.messages = [];
+    },
+    rematch(){
+      socket.emit('rematch');
     },
     send_message(msg){
       socket.emit('msg', msg);
@@ -254,8 +282,15 @@ socket.on('msg', function(msg, emiter) {
   app.receive_message(msg, emiter);
 });
 
-socket.on('room joined', function(state) {
+socket.on('room_joined', function(state) {
   app.room = state;
+  app.joining = false;
+});
+
+
+socket.on('room_not_found', function() {
+  app.target_id = 'expired';
+  app.joining = false;
 });
 
 socket.on('turn', function(state) {

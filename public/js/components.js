@@ -236,34 +236,37 @@ Vue.component('selection', {
 Vue.component('join-room', {
   data:function(){return {
     player:readCookie('playername')||'',
-    room:readCookie('favoriteroom')||'',
   };},
+  props:['invitation_id'],
   methods:{
-    join(){
-      createCookie('favoriteroom', this.room)
+    play(private){
       createCookie('playername', this.player)
-      this.$emit('join_room', this.player, this.room);
+      this.$emit('join_room', this.player, private);
+    },
+    play_private(){
+      this.play(true);
     }
-
   },
   template: `
   <div
   class="fullscreen"
   id="join-room"
-  @keyup.enter="join()">
-    <h1>Join a room</h1>
+  @keyup.enter="play">
+    <h1>Golden Age</h1>
     <div>
       <label for="player">Your name</label>
       <input name="player" v-model="player"/>
     </div>
-    <div>
-      <label for="room">Room name</label>
-      <small>To have more chance to find an opponent, leave this field empty!</small>  
-      <input name="room"  v-model="room"/>
+
+    <div v-if="invitation_id && invitation_id != 'expired'">
+      <small>You have been invited to room {{invitation_id}}</small>
+      <button @click="play()">play</button>
     </div>
 
-    <div>
-      <button @click="join">join</button>
+    <div v-else>
+      <small v-if="invitation_id == 'expired'">Sorry but your invitation link has expired...</small>
+      <button @click="play()">play</button>
+      <button @click="play_private()">play in a private room</button>
     </div>
   </div>
     `
@@ -277,7 +280,8 @@ Vue.component('loading', {
   <div class="fullscreen" id="loading">
     <h1>Loading</h1>
     <fill-bar :value="progress" max=1 :percent="true"></fill-bar>
-  </div>
+    <h2 v-if="progress==1">Waiting for server response...</h2>
+    </div>
     `
 });
 
@@ -291,7 +295,11 @@ Vue.component('start', {
 });
 
 Vue.component('end', {
-  props: ['status', 'reason'],
+  data(){return{
+    stats_link:'/stats.html?room='+this.$root.room.id,
+    replay_link:'/replay.html?room='+this.$root.room.id,
+  }},
+  props: ['status', 'reason', 'rematch_propositions'],
   methods: {
     get_reason(){
       const sentences = {
@@ -327,25 +335,62 @@ Vue.component('end', {
         draw:  "It's a draw !",
       }
       return sentences[this.status];
-    }
+    },
+    i_want_rematch(){
+      return this.rematch_propositions.indexOf(this.$root.id) >= 0;
+    },
+    oponent_want_rematch(){
+      return this.rematch_propositions.length && !this.i_want_rematch();
+    },
   },
   template: `
   <div class="panel" id="end">
     <small>{{get_reason()}}</small>
     <h2>{{get_status()}}</h2>
+    <button @click="$emit('quit')">quit</button>
+    <small v-if="oponent_want_rematch()">Your opponent proposes a rematch</small>
+    <button v-if="oponent_want_rematch()" @click="$emit('rematch')">accept the rematch</button>
+    <button v-else @click="$emit('rematch')" :disabled="i_want_rematch()">{{i_want_rematch()?'rematch proposed':'propose a rematch'}}</button>
+    <a :href="stats_link" target="_blank">Open the stats</a>
+    <a :href="replay_link" target="_blank">Open the replay</a>
   </div>
   `
 
 });
 
 Vue.component('waiting', {
+  data(){return{
+    invite_link:window.location.origin+'/?room='+this.$root.room.id,
+    copied:false
+  }},
+  props:['room'],
+  methods:{
+    copy_link(){
+      if(!navigator.clipboard) return;
+      navigator.clipboard
+        .writeText(this.invite_link)
+        .then(() => {this.copied = true; setTimeout(()=>{this.copied=false;}, 3000)})
+        .catch((err) => console.error(`Error copying to clipboard: ${err}`));
+    }
+  },
   template: `
   <div class="panel" id="waiting">
+    <small v-if="room.private">You are in a private room, no one will come unless invited.</small>
+    <small v-else>You are in a public room, the first player to log in will join your room.</small>
+
     <h2>Waiting for a player...</h2>
-    <small>Tired to wait ? Invite a bot :</small>
-    <button @click="$emit('bot', 'hard')">Invite hard bot</button>
-    <button @click="$emit('bot', 'medium')">Invite medium bot</button>
-    <button @click="$emit('bot', 'easy')">Invite easy bot</button>
+
+    <div>
+      <small>Invite a friend by sending them this link: {{invite_link}}</small>
+      <button @click="copy_link" :disabled="copied">{{copied?'Link copied':'Copy link'}}</button>
+    </div>
+    
+    <div>
+      <small>Invite a bot :</small>
+      <button @click="$emit('bot', 'hard')">hard</button>
+      <button @click="$emit('bot', 'medium')">medium</button>
+      <button @click="$emit('bot', 'easy')">easy</button>
+    </div>
   </div>
   `
 });

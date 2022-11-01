@@ -3,7 +3,7 @@ import http from 'http'
 import {Server} from 'socket.io'
 import dir_tree from 'directory-tree';
 
-import {rooms, get_room} from './engine/room.js';
+import {rooms, get_private_room, get_public_room, get_room_by_id} from './engine/room.js';
 import {players, new_player, remove_player, get_player} from './engine/player.js';
 import {new_vector as V} from './engine/vector.js';
 
@@ -34,6 +34,9 @@ function cheat(player, msg){
     case '!FREEGOLD':
       player.gold += 100;
       break;
+    case '!GOGOLD':
+      player.gold += 500;
+      break;
     case '!NOFOG':
       player.room.fog_of_war = false;
       break;
@@ -56,11 +59,21 @@ io.on('connection', (socket) => {
   console.log('connection', socket.id)
 
   socket.on('join', (data) => {
-    let room = get_room(data.room, io);
+    let room;
+    if(data.room) room = get_room_by_id(data.room, io);
+    else if(data.private) room = get_private_room(io);
+    else room = get_public_room(io);
+
+    
+    if(!room) {
+      socket.emit('room_not_found');
+      return;
+    }
+
     let player = new_player(data.player, socket.id);
     socket.join(room.id);
     room.add_player(player);
-    socket.emit('room joined', room.get_state());
+    socket.emit('room_joined', room.get_state());
     send_message(room, `${player.name} joined the room`);
   });
 
@@ -94,20 +107,30 @@ io.on('connection', (socket) => {
     player.room.add_bot(difficulty)
   });
 
+  socket.on('rematch', () => {
+    let player = get_player(socket.id);
+    if(!player) return;
+    player.room.rematch(player.id);
+    send_message(player.room, `${player.name} propose a rematch`);
+  });
+
   socket.on('quit', () => {
     let player = get_player(socket.id);
     if(!player) return;
+    let room = player.room;
+    socket.leave(room.id)
     player.quit();
     remove_player(socket.id);
-    send_message(player.room, `${player.name} quited the room`);
+    send_message(room, `${player.name} quited the room`);
   });
 
   socket.on('disconnect', () => {
     let player = get_player(socket.id);
     if(!player) return;
+    let room = player.room;
     player.quit();
     remove_player(socket.id);
-    send_message(player.room, `${player.name} disconnected`);
+    send_message(room, `${player.name} disconnected`);
 
   });
 

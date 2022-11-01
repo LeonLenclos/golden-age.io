@@ -2,6 +2,7 @@ import {House, Factory, Gold, Unit, Building, Water} from './entity.js';
 
 const DEFAULT_PLAYER_NAME = 'someone';
 const GOLD_MAX = 500;
+const GOLD_START = 20;
 
 const HARD = 'hard';
 const MEDIUM = 'medium';
@@ -30,10 +31,15 @@ export class Player {
   constructor(name, id){
     this.name = name || DEFAULT_PLAYER_NAME;
     this.id = id;
-    this.gold = 20;
+    this.gold = GOLD_START;
     this.gold_max = GOLD_MAX;
     this.color = 'white';
     this.room = undefined;
+    this.victory = undefined;
+  }
+
+  reset(){
+    this.gold = GOLD_START;
     this.victory = undefined;
   }
 
@@ -47,6 +53,7 @@ export class Player {
 
   quit(){
     this.room?.remove_player(this);
+    this.room = undefined;
   }
   
   update(){

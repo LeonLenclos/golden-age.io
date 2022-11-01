@@ -7,18 +7,20 @@
 <body>
   <main id="app">
 
-    <start
+    <!-- <start
       v-if="!started"
       @start="start()"
-    ></start>
+    ></start> -->
+    <join-room
+      v-if="!room && !joining"
+      :invitation_id="target_id"
+      @join_room="join_room"
+      @join_private_room="join_room"
+    ></join-room>
     <loading
-      v-else-if="loading<1"
+      v-if="joining"
       :progress="loading"
     ></loading>
-    <join-room
-      v-else-if="!room"
-      @join_room="join_room"
-    ></join-room>
 
     <header v-if=room>
       <room
@@ -74,10 +76,14 @@
           v-else-if="room?.playing=='ended'"
           :status="who_is(id).victory.status"
           :reason="who_is(id).victory.reason"
+          :rematch_propositions="room.rematch_propositions"
+          @rematch="rematch"
+          @quit="quit_room"
         ></end>
         <waiting
         v-else-if="room?.playing=='not started'"
           @bot="bot"
+          :room="room"
         ></waiting>
         <div v-else class="panel"></div>
       </aside>

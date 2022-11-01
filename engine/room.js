@@ -10,6 +10,7 @@ const START_COUNTDOWN = -10;
 
 const PLAYING = 'playing';
 const NOT_STARTED = 'not started';
+const STARTING = 'starting';
 const PAUSED = 'paused';
 const ENDED = 'ended';
 
@@ -24,9 +25,21 @@ const DRAW = 'draw';
 
 export let rooms = [];
 
-export function get_room(name, io) {
-  let room = rooms.filter((r)=>r.is_free()).find((r)=>r.name == name);
-  return room || new Room(name, io);
+export function get_room_by_id(id, io) {
+  let room = rooms.find((r)=>r.id == id && r.is_free());
+  return room
+}
+
+export function get_public_room(io) {
+  let room = rooms.find((r)=>!r.private && r.is_free());
+  if(!room) room = new Room(io);
+  return room
+}
+
+export function get_private_room(io) {
+  let room = new Room(io);
+  room.private = true;
+  return room
 }
 
 export function close_room(id) {
@@ -38,20 +51,36 @@ export function close_room(id) {
 
 
 export class Room {
-  constructor(name, io) {
+  constructor(io) {
     this.id = urid();
-    this.name = name;
     this.io = io;
     this.players = [];
+    this.private = false;
+    this.reset();
+    this.turn_interval_id = setInterval(()=>{this.update()}, TURN_INTERVAL_TIME)
+    rooms.push(this);
+  }
+
+  reset(){
     this.world = new World();
     this.turn = START_COUNTDOWN;
     this.turn_max = TURN_MAX;
     this.playing = NOT_STARTED;
     this.fog_of_war = true;
     this.turn_increment = 1;
-    
-    this.turn_interval_id = setInterval(()=>{this.update()}, TURN_INTERVAL_TIME)
-    rooms.push(this);
+    this.rematch_propositions = new Set();
+    this.players.forEach(player => player.reset());
+  }
+
+  rematch(player_id){
+    if(this.playing != ENDED) return;
+    if(this.players.length != 2) return;
+    this.rematch_propositions.add(player_id);
+    if(this.rematch_propositions.size == 2){
+      this.rematch_propositions.clear();
+      this.reset();
+    }
+    this.emit('turn', this.get_state());
   }
 
   emit(...args){
@@ -63,7 +92,8 @@ export class Room {
   }
 
   get_name(){
-    return this.name || DEFAULT_ROOM_NAME;
+    let publicity = this.private ? 'private' : 'public' 
+    return `${publicity} room n° ${this.id}`;
   }
 
   is_free(){
@@ -72,6 +102,8 @@ export class Room {
 
   remove_player(player){
     this.players = this.players.filter(p=> p.id != player.id);
+    this.emit('turn', this.get_state());
+
   }
 
   start(){
@@ -145,19 +177,29 @@ export class Room {
       return;
     }
     this.players.forEach(player=>player.update());
+
     if(this.playing == PLAYING){
       this.turn += this.turn_increment;
       this.world.update();
       this.victory_condition();      
       this.emit('turn', this.get_state());
     }
+
     else if(this.playing == NOT_STARTED){
       if(this.players.length==2) {
-        this.turn ++;
-        this.emit('turn', this.get_state());
-        if(this.turn >= 0){
-          this.start();
-        }
+        this.set_playing(STARTING)
+      }
+    }
+
+    else if(this.playing == STARTING){
+      if(this.players.length < 2){
+        this.set_playing(ENDED);
+        this.players[0].set_victory(WIN, CONCEDE);
+      }
+      this.turn ++;
+      this.emit('turn', this.get_state());
+      if(this.turn >= 0){
+        this.start();
       }
     }
   }
@@ -171,6 +213,9 @@ export class Room {
       turn_max:this.turn_max,
       players:this.players.map(p=>p.get_state()),
       fog_of_war:this.fog_of_war,
+      private:this.private,
+      id:this.id,
+      rematch_propositions:Array.from(this.rematch_propositions),
     };
   }
 
