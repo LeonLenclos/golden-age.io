@@ -181,7 +181,6 @@ export class Bot extends Player {
       let good_situation = allies.filter(a=>a instanceof Unit).length > 5 && this.gold > 100;
       if(!good_situation) return false;
       let free_enemies = visibles.filter(v=> !this.own(v) && !(v instanceof Gold) && !allies.some(a=>a.pos.equals(v.pos)));
-      console.log('free_enemies.length', free_enemies.length)
       if(!free_enemies.length) return false;
       let nearest_enemy = nearest(free_enemies, e);
       e.set_target(nearest_enemy.pos);
