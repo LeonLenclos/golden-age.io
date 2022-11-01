@@ -473,8 +473,10 @@ Vue.component('main-map', {
       // can't target itself
       if(this.allies_at(pos).some(e=>e.id == this.selection)) return false;
       let entity = this.$root.what_is(this.selection);
+      // can't target if selection does not exists
+      if(!entity) return false;
       // can't target if selection is an empty bulding
-      if(entity.building && !this.allies_at(entity.pos).some(e=>!e.building))return false;
+      if(entity.building && !this.allies_at(entity.pos).some(e=>!e.building)) return false;
       return true
     },
     on_click(pos){
