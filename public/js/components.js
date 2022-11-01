@@ -296,8 +296,7 @@ Vue.component('start', {
 
 Vue.component('end', {
   data(){return{
-    stats_link:'/stats.html?room='+this.$root.room.id,
-    replay_link:'/replay.html?room='+this.$root.room.id,
+    history_link:'/history.html?room='+this.$root.room.id+'&match='+this.$root.room.match+'&player='+this.$root.id,
   }},
   props: ['status', 'reason', 'rematch_propositions'],
   methods: {
@@ -351,8 +350,7 @@ Vue.component('end', {
     <small v-if="oponent_want_rematch()">Your opponent proposes a rematch</small>
     <button v-if="oponent_want_rematch()" @click="$emit('rematch')">accept the rematch</button>
     <button v-else @click="$emit('rematch')" :disabled="i_want_rematch()">{{i_want_rematch()?'rematch proposed':'propose a rematch'}}</button>
-    <a :href="stats_link" target="_blank">Open the stats</a>
-    <a :href="replay_link" target="_blank">Open the replay</a>
+    <a :href="history_link" target="_blank">Open the history</a>
   </div>
   `
 
@@ -384,7 +382,7 @@ Vue.component('waiting', {
       <small>Invite a friend by sending them this link: {{invite_link}}</small>
       <button @click="copy_link" :disabled="copied">{{copied?'Link copied':'Copy link'}}</button>
     </div>
-    
+
     <div>
       <small>Invite a bot :</small>
       <button @click="$emit('bot', 'hard')">hard</button>

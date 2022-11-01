@@ -1,6 +1,6 @@
 import urid from 'urid';
 import {World} from './world.js';
-import {Entity, Unit} from './entity.js';
+import {Entity, Unit, Building} from './entity.js';
 import { Bot } from './player.js';
 
 const TURN_INTERVAL_TIME = 1250; //ms
@@ -24,6 +24,7 @@ const WIN = 'win';
 const DRAW = 'draw';
 
 export let rooms = [];
+export let history = [];
 
 export function get_room_by_id(id, io) {
   let room = rooms.find((r)=>r.id == id && r.is_free());
@@ -49,10 +50,54 @@ export function close_room(id) {
   rooms = rooms.filter(r=>r.id != id);
 }
 
+export class History {
+  constructor(room){
+    this.turns = [];
+    this.id = room.id;
+    this.match = room.match;
+    let datetime = new Date();
+    this.date = datetime.toISOString().slice(0,10);
+    history.push(this);
+  }
+
+  push_state(room){
+    let players = {}
+    room.players.forEach(p=>{players[p.id] = {
+        gold:p.gold,
+        units:p.get_allies().filter(a=>a instanceof Unit).length,
+        buildings:p.get_allies().filter(a=>a instanceof Building).length,
+    }});
+    let state = {
+      turn:room.turn,
+      players,
+    }
+    this.turns.push(state);
+  }
+
+  end(room){
+    this.players=room.players.map(p=>{return{
+      name:p.name,
+      id:p.id,
+      victory:p.victory
+    }});
+  }
+
+  get(){
+    return {
+      room:this.id,
+      match:this.match,
+      date:this.date,
+      players:this.players,
+      turns:this.turns,
+
+    }
+  }
+}
 
 export class Room {
   constructor(io) {
     this.id = urid();
+    this.match = 0;
     this.io = io;
     this.players = [];
     this.private = false;
@@ -62,6 +107,7 @@ export class Room {
   }
 
   reset(){
+    this.history = new History(this);
     this.world = new World();
     this.turn = START_COUNTDOWN;
     this.turn_max = TURN_MAX;
@@ -78,6 +124,7 @@ export class Room {
     this.rematch_propositions.add(player_id);
     if(this.rematch_propositions.size == 2){
       this.rematch_propositions.clear();
+      this.match ++;
       this.reset();
     }
     this.emit('turn', this.get_state());
@@ -166,6 +213,7 @@ export class Room {
       this.players.forEach(p=>{p.set_victory(
         (winner == p ? WIN : winner ? LOOSE : DRAW), victory
       )});
+      this.history.end(this);
       return true;
     }
     return false;
@@ -179,6 +227,7 @@ export class Room {
     this.players.forEach(player=>player.update());
 
     if(this.playing == PLAYING){
+      this.history.push_state(this);
       this.turn += this.turn_increment;
       this.world.update();
       this.victory_condition();      
@@ -193,8 +242,10 @@ export class Room {
 
     else if(this.playing == STARTING){
       if(this.players.length < 2){
-        this.set_playing(ENDED);
-        this.players[0].set_victory(WIN, CONCEDE);
+        this.victory_condition();      
+
+        // this.set_playing(ENDED);
+        // this.players[0].set_victory(WIN, CONCEDE);
       }
       this.turn ++;
       this.emit('turn', this.get_state());
@@ -215,6 +266,7 @@ export class Room {
       fog_of_war:this.fog_of_war,
       private:this.private,
       id:this.id,
+      match:this.match,
       rematch_propositions:Array.from(this.rematch_propositions),
     };
   }

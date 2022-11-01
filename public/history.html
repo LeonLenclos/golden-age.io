@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Golden Age - History</title>
+  <link rel="stylesheet" href="css/history.css">
+</head>
+<body>
+  <h1>History</h1>
+  
+  <table id="table">
+</table>
+<table id="error">
+</table>
+<div id="charts">
+</div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/lib/vector.js"></script>
+  <script src="js/lib/cookies.js"></script>
+  <script src="js/lib/vue.js"></script>
+  <script src="js/lib/chart.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/svg-components.js"></script>
+
+
+  <script>
+
+
+    function load_history(room, match, player_id){
+        fetch('history.json?room='+room+'&match='+match)
+        .then(response => response.json())
+        .then(json => display_history(json, room, match, player_id));
+    }
+
+    function make_config(turns, key, player, oponent, labels){
+        const make_dataset = (turns, key, player, color)=>{return{
+            label:player.name,
+            data: turns,
+            parsing: {yAxisKey: ['players', player.id, key].join('.')},
+            borderColor: color,
+            pointRadius: 0,
+        }};
+
+        let type = 'line';
+        let options = {parsing: {xAxisKey: 'turn'}};
+        let datasets = [make_dataset(turns, key, player, '#f22'), make_dataset(turns, key, oponent, '#22f')]
+        let data = {labels, datasets};
+        return {type, data, options};
+    }
+
+    function populate_table(json, player_id){
+        const table = document.getElementById('table');
+        let tr;
+
+        const cell = (tr, txt, span)=>{
+            span = span || 1
+            let td = tr.insertCell();
+            td.innerText = txt
+            td.setAttribute('rowSpan', span)
+        }
+        tr = table.insertRow();
+        cell(tr, 'room'); cell(tr, json.room);
+        tr = table.insertRow();
+        cell(tr, 'match'); cell(tr, json.match);
+        tr = table.insertRow();
+        cell(tr, 'date'); cell(tr, json.date);
+        tr = table.insertRow();
+        tr.style.background= json.players[0].id==player_id ? "#f99" : "#99f"
+        cell(tr, json.players[0].name); cell(tr, json.players[0].victory.status + ' ('+json.players[0].victory.reason+')');
+        tr = table.insertRow();
+        tr.style.background= json.players[1].id==player_id ? "#f99" : "#99f"
+        cell(tr, json.players[1].name); cell(tr, json.players[1].victory.status + ' ('+json.players[1].victory.reason+')');
+
+
+    }
+
+    function error(){
+        document.getElementById('error').innerText = 'Oups, history not found...'
+    }
+
+    function display_history(json, room, match, player_id){
+        if(json.err){
+            error();
+            return;
+        }
+        const player = json.players.find(p=>p.id==player_id);
+        if(!player){
+            error();
+            return;
+        }
+        const oponent = json.players.find(p=>p.id!=player_id);
+        const keys = Object.keys(json.turns[0].players[player.id]);
+        const range = (a,b) => a > b ? [] : [a, ...range(a + 1, b)];
+        const labels = range(0,json.turns.length);
+        const charts = document.getElementById('charts');
+        keys.forEach(key=>{
+            let config = make_config(json.turns, key, player, oponent, labels)
+            let canvas = document.createElement('canvas');
+            let h2 = document.createElement('h2');
+            h2.innerText = key;
+            charts.appendChild(h2);
+            charts.appendChild(canvas);
+            new Chart(canvas, config);
+        })
+        populate_table(json, player_id);
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const room = urlParams.get('room');
+    const match = urlParams.get('match');
+    const player_id = urlParams.get('player');
+    load_history(room, match, player_id);
+
+
+
+  </script>
+</body>
+</html>

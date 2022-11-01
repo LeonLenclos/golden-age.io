@@ -3,7 +3,7 @@ import http from 'http'
 import {Server} from 'socket.io'
 import dir_tree from 'directory-tree';
 
-import {rooms, get_private_room, get_public_room, get_room_by_id} from './engine/room.js';
+import {rooms, history, get_private_room, get_public_room, get_room_by_id} from './engine/room.js';
 import {players, new_player, remove_player, get_player} from './engine/player.js';
 import {new_vector as V} from './engine/vector.js';
 
@@ -21,6 +21,13 @@ const assets_tree = dir_tree('./public/assets', {attributes:["extension"]}, file
 app.use(express.static('./public'));
 app.get('/assets.json', (req, res) => res.send(assets_tree));
 app.get('/stat.json', (req, res) => res.send({rooms:rooms.length, players:players.length}));
+app.get('/history.json', (req, res) => {
+  const room = req.query.room;
+  const match = req.query.match;
+  let hist = history.find(h=>h.id==room&&h.match==match);
+  if(hist) res.send(hist.get());
+  else res.send({err:'not found'})
+});
 
 
 function send_message(room, msg, emiter){
