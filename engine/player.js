@@ -85,7 +85,8 @@ export class Player {
 
 export class Bot extends Player {
   constructor(difficulty){
-    super('bot', 'bot');
+    let name = 'bot_'+difficulty[0]
+    super(name, name);
     this.difficulty = difficulty;
   }
 

@@ -126,6 +126,11 @@ export class Room {
       this.rematch_propositions.clear();
       this.match ++;
       this.reset();
+    } else {
+      let other_player = this.players.find(p=>p.id!=player_id)
+      if(other_player instanceof Bot){
+        this.rematch(other_player);
+      }
     }
     this.emit('turn', this.get_state());
   }

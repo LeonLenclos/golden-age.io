@@ -5,7 +5,7 @@ import {
 } from './entity.js';
 
 
-const CRITICAL_CREATE_PROB = .2
+const CRITICAL_CREATE_PROB = .4
 
 export class Action {
 
