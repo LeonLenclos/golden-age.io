@@ -1,7 +1,3 @@
-
-
-
-
 Vue.component('messages', {
   data(){
     return {
@@ -76,7 +72,7 @@ Vue.component('entity-name', {
 Vue.component('room', {
   props: ['room'],
   template: `
-  <div title="room" id="room">
+  <div id="room">
     <header>
       <h2>{{room.name}}</h2>
       <button @click="$emit('quit_room')">quit</button>
@@ -187,7 +183,7 @@ Vue.component('player-card', {
 Vue.component('inspector', {
   props: ['pos', 'entities'],
   template: `
-  <div class="panel" title="inspector" id="inspector">
+  <div class="panel" id="inspector">
     <small v-if="pos.x&&pos.y">inspecting position {{pos.x}},{{pos.y}}</small>
     <small v-else>(move your mouse over the map to inspect)</small>
     <div class=cards>
@@ -334,7 +330,7 @@ Vue.component('end', {
     }
   },
   template: `
-  <div class="panel" title="end" id="end">
+  <div class="panel" id="end">
     <small>{{get_reason()}}</small>
     <h2>{{get_status()}}</h2>
   </div>
@@ -344,7 +340,7 @@ Vue.component('end', {
 
 Vue.component('waiting', {
   template: `
-  <div class="panel" title="waiting" id="waiting">
+  <div class="panel" id="waiting">
     <h2>Waiting for a player...</h2>
     <small>Tired to wait ? Invite a bot :</small>
     <button @click="$emit('bot', 'hard')">Invite hard bot</button>
@@ -400,7 +396,26 @@ Vue.component('main-map', {
       if(!this.$root.room.fog_of_war) return true;
       return this.allies.some(e=>Math.abs(pos.x-e.pos.x)+Math.abs(pos.y-e.pos.y)<4);
     },
-
+    intro_visibility(pos){
+      const manhattan = (a, b) => Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
+      let center  = {x:this.world.size.x/2-.5, y:this.world.size.y/2-1/2}
+      let intro = 1-manhattan(pos, center)/manhattan(center, this.world.size);
+      intro = intro*5 - this.$root.room.turn;
+      intro /= 15
+      intro = Math.floor(intro*6)/6;
+      if(this.$root.room.turn == -10) return 1;
+      return intro;
+    },
+    visibility(pos){
+      const manhattan = (a, b) => Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
+      shortest_dist = this.allies.reduce((dist, e)=>{return Math.min(dist, manhattan(pos, e.pos))}, 4);
+      // let v = (shortest_dist/4)**3;
+      if(this.$root.room.turn < 0) return this.intro_visibility(pos);
+      if(shortest_dist<3) return 1;
+      if(shortest_dist==3) return .85;
+      if(!this.$root.room.fog_of_war) return .7;
+      return 0;
+    },
     on_mouse_enter(pos){
       this.hover_pos = pos
       if(this.is_visible(pos)) this.$emit('inspect', pos);
@@ -471,6 +486,7 @@ Vue.component('main-map', {
           <cell
             :class="{target:selection, select:is_ally_at({x, y})}"
             :visible="is_visible({x,y})"
+            :visibility="visibility({x, y})"
             :pos="{x,y}"
             :entities="entities_at({x,y})"
             :events="events_at({x,y})"
@@ -505,7 +521,8 @@ Vue.component('cell', {
     'pos',
     'entities',
     'events',
-    'visible'
+    'visible',
+    'visibility'
   ],
   methods:{
     zindex(entity){
@@ -542,6 +559,8 @@ Vue.component('cell', {
       :turn=$root.room.turn
       draggable="false"
     />
+
+    <span class="fog" :style="'opacity:'+(1-visibility)"></span>
 
   </div>
     `
