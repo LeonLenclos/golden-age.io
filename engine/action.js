@@ -47,11 +47,6 @@ export class Walk extends Action {
 
   static type = 'walk';
 
-  is_walkable(pos){
-    let entities = this.entity.world.get_entities_at(pos)
-    return !entities.some(e=>e.owner == this.entity.owner && e instanceof Unit)
-  }
-
   some_enemy(){
     let entities = this.entity.world.get_entities_at(this.entity.pos)
     return entities.some(e=>e.owner && e.owner != this.entity.owner);
@@ -61,7 +56,8 @@ export class Walk extends Action {
   is_possible(){
     if(!this.entity.path) return;
     let step = this.entity.path[0];
-    return step && this.is_walkable(step) && !this.some_enemy();
+    // return step && !this.some_enemy();
+    return step && this.entity.world.is_walkable_for(step, this.entity.owner) && !this.some_enemy();
   }
 
   do(){

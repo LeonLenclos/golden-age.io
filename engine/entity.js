@@ -173,7 +173,7 @@ export class Unit extends Entity {
 
   set_target(pos){
     this.target = pos;
-    this.path = find_nearest_path(this.pos, this.target, this.world);
+    this.path = find_nearest_path(this.pos, this.target, this.world, this.owner);
   }
 
   get_residence(){

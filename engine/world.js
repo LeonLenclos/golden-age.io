@@ -1,6 +1,6 @@
 import {new_vector as V} from './vector.js';
 import {createNoise2D} from 'simplex-noise';
-import {Gold, Water} from './entity.js';
+import {Gold, Water, Unit} from './entity.js';
 import {find_path} from './path.js';
 const DEFAULT_SIZE = V(20, 15)
 const GOLD_NOISE_SCALE = 2.5;
@@ -123,6 +123,13 @@ export class World {
 
   is_free(pos){
     return this.get_entities_at(pos).length==0 && this.is_inside(pos);
+  }
+
+  is_walkable_for(pos, owner){
+    let blocking_entities = this.get_entities_at(pos).some(e=>{
+      return e instanceof Water || (owner && e instanceof Unit && owner.own(e))
+    });
+    return !blocking_entities && this.is_inside(pos);
   }
 
   is_spawnable(pos){
