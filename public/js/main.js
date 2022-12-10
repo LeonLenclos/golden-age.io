@@ -231,7 +231,7 @@ var app = new Vue({
       if(this.room.playing != 'playing') return [];
       let allies = this.room.world.entities.filter(e=>e.owner==this.id)
       return objects.filter(e=>{
-        return e.owner == this.id || allies.some(a=>{
+        return e.owner == this.id || e.type=='water' || allies.some(a=>{
           return Math.abs(e.pos.x-a.pos.x) + Math.abs(e.pos.y-a.pos.y) < 4
         });
       });

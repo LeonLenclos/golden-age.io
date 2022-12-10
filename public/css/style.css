@@ -194,9 +194,11 @@ button:active{
 }
 
 
-.cell.visible {
+.cell {
   background: var(--sand);
 }
+
+
 
 @keyframes moving {
   from{

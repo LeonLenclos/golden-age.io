@@ -402,7 +402,7 @@ Vue.component('main-map', {
       map_pos:{x:0,y:0},
       hover_pos:undefined,
       allies:[],
-
+      unvisited:undefined,
     };
   },
   props: [
@@ -416,10 +416,26 @@ Vue.component('main-map', {
   watch:{
     entities(new_entities){
       if(!new_entities) return;
+      if(this.unvisited) this.unvisited = this.unvisited.filter(pos=>!this.is_visible(pos))
       this.allies = new_entities.filter(e=>e.owner==this.$root.id);
     }
   },
   methods:{
+
+    is_visited(pos){
+      if(this.unvisited===undefined && this.world){
+        this.unvisited = [];
+        for (let x = 0; x < this.world.size.x; x++) {
+          for (let y = 0; y < this.world.size.y; y++) {
+            this.unvisited.push({x,y});
+          }
+        }  
+
+        return false;
+      }
+      // console.log('visited', !this.unvisited.some(p=>p.x==pos.x && p.y==pos.y))
+      return !this.unvisited.some(p=>p.x==pos.x && p.y==pos.y)
+    },
     get_selected(){
       return this.entities.find(e=>e.id==this.selection)
     },
@@ -532,6 +548,7 @@ Vue.component('main-map', {
             :class="{target:selection, select:is_ally_at({x, y})}"
             :visible="is_visible({x,y})"
             :visibility="visibility({x, y})"
+            :visited="is_visited({x,y})"
             :pos="{x,y}"
             :entities="entities_at({x,y})"
             :events="events_at({x,y})"
@@ -567,6 +584,7 @@ Vue.component('cell', {
     'entities',
     'events',
     'visible',
+    'visited',
     'visibility'
   ],
   methods:{
@@ -587,14 +605,22 @@ Vue.component('cell', {
   <div :class="{cell:true, inspected:is_inspected(), visible:visible}">
 
 
-    <entity
-      v-if=visible
-      v-for="entity in entities?.sort(sorting)"
-      :entity=entity
-      :turn=$root.room.turn
-      :selected="is_selected(entity)"
-      draggable="false"
-    />
+  <entity
+    v-if=visible
+    v-for="entity in entities?.sort(sorting)"
+    :entity=entity
+    :turn=$root.room.turn
+    :selected="is_selected(entity)"
+    draggable="false"
+  />
+  <entity
+    v-else-if="visited"
+    v-for="entity in entities?.sort(sorting)"
+    :entity=entity
+    :turn=$root.room.turn
+    :selected="is_selected(entity)"
+    draggable="false"
+  />
 
 
     <event
@@ -605,7 +631,8 @@ Vue.component('cell', {
       draggable="false"
     />
 
-    <span class="fog" :style="'opacity:'+(1-visibility)"></span>
+    <span v-if="visited" class="fog" :style="'opacity:'+(0.8-visibility)"></span>
+    <span v-else class="fog" :style="'opacity:'+(1-visibility)"></span>
 
   </div>
     `
