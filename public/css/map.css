@@ -1,0 +1,123 @@
+
+/********* MAP **************/
+
+#map {
+  position: relative;
+  background: var(--water);
+  margin:2px;
+}
+
+#map table {
+ border-collapse: collapse;
+}
+
+#map td {
+  padding:0;
+  border:1px solid var(--water);
+}
+
+#map .arrow,
+#map .arrow-path{
+  position: absolute;
+  top:0;
+  left:0;
+  pointer-events:none;
+}
+
+#map .arrow-path {
+}
+#map .arrow-path * {
+  stroke:var(--red);
+   fill:var(--red);
+}
+
+/********* CELL (MAP) **************/
+
+.cell {
+  width:var(--cell-size);
+  height: var(--cell-size);
+  background: var(--sand);
+
+}
+
+.cell.select:hover:after,
+.cell.select:active:after {
+  content:'';
+  position: relative;
+  z-index: 1;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: block;
+
+}
+.cell.select:hover:after{
+  top:-1px;
+  left:-1px;
+  border: 1px solid white;
+}
+
+.cell.select:active:after{
+  top:-2px;
+  left:-2px;
+  border: 2px solid white;
+}
+
+
+.cell * {
+  position: absolute;
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-drag: none;
+}
+
+
+
+@keyframes moving {
+  from{
+    translate:var(--left-offset) var(--top-offset);
+  }
+  to{
+    translate:0 0;
+  }
+}
+
+.cell .movingfromleft,
+.cell .movingfromright,
+.cell .movingfromtop,
+.cell .movingfrombottom
+ {
+  --top-offset: 0;
+  --left-offset: 0;
+   position: absolute;
+   animation-duration: .4s;
+   animation-name: moving;
+   animation-timing-function: ease-out;
+}
+
+
+.cell .movingfromleft {
+  --left-offset:calc(-1 * var(--cell-size));
+}
+
+.cell .movingfromright {
+  --left-offset:var(--cell-size);
+}
+
+.cell .movingfromtop {
+  --top-offset: calc(-1 * var(--cell-size));
+}
+
+.cell .movingfrombottom{
+  --top-offset: var(--cell-size);
+}
+
+.fog {
+  background: var(--dark-water);
+  width:var(--cell-size);
+  height: var(--cell-size);
+  display:block;
+  position: absolute;
+}

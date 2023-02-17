@@ -2,7 +2,10 @@
 <html>
 <head>
   <title>Golden Age</title>
+  <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/svg.css">
+  <link rel="stylesheet" href="css/map.css">
 </head>
 <body>
   <main id="app">
@@ -17,6 +20,7 @@
       @join_room="join_room"
       @join_private_room="join_room"
     ></join-room>
+
     <loading
       v-if="joining"
       :progress="loading"
@@ -89,6 +93,7 @@
       </aside>
 
     </main>
+
   </main>
   <script src="/socket.io/socket.io.js"></script>
   <script src="js/lib/howler.js"></script>

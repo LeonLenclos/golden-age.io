@@ -1,0 +1,58 @@
+svg.entity,
+svg.event{
+  width:var(--cell-size);
+  height:var(--cell-size);
+  display:inline;
+  fill:var(--white);
+  stroke:var(--black);
+  stroke-width:0.07em;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.ally path[data-color="player"]{
+  fill:var(--red);
+}
+
+
+.enemy path[data-color="player"]{
+  fill:var(--blue);
+}
+
+path[data-color="water"]{
+  fill:var(--water);
+  stroke:var(--dark-water);
+
+}
+.water {
+  background: var(--water);
+}
+
+
+path[data-color="silver"]{
+  fill:var(--silver);
+}
+
+path[data-color="iron"]{
+  fill:var(--iron);
+}
+
+path[data-color="gold"]{
+  fill:var(--gold);
+}
+
+path[data-color="white"]{
+  fill:var(--white);
+  stroke:var(--white);
+}
+
+svg.selected {
+    filter:
+     brightness(1.3)
+      drop-shadow(1px  0    0 white)
+      drop-shadow(-1px 0    0 white)
+      drop-shadow(0    1px  0 white)
+      drop-shadow(0    -1px 0 white)
+    ;
+  }
+  
