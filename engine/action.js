@@ -2,10 +2,15 @@ import {
   Unit,
   Gold,
   Building,
+  Factory,
+  House,
 } from './entity.js';
 
 
 const CRITICAL_CREATE_PROB = .4
+const WORK_HIT_PROB = .4;
+const REST_HEAL_PROB = .4;
+
 
 export class Action {
 
@@ -93,6 +98,7 @@ export class Mine extends Action {
   }
 }
 
+
 export class Attack extends Action {
 
   static type = 'attack';
@@ -171,6 +177,57 @@ export class Reside extends Action {
   }
   
 }
+
+export class Work extends Reside {
+
+  static type = 'work';
+
+  get_factory(){
+    let residence = this.entity.get_residence() 
+    let entities = this.entity.world.get_entities_at(this.entity.pos);
+    let other_unit = entities.find(e=>e.id != this.entity.id && (e instanceof Unit));
+    if(residence instanceof Factory && !other_unit) return residence;
+  }
+
+  is_possible(){
+    return super.is_possible() && this.get_factory();
+  }
+
+  do(){
+    super.do();
+    //let factory = this.get_factory();
+    this.entity.owner.gold ++;
+    if(Math.random()<WORK_HIT_PROB){
+      this.entity.hit(1);
+    }
+  }
+}
+
+
+export class Rest extends Reside {
+
+  static type = 'rest';
+
+  get_house(){
+    let residence = this.entity.get_residence();
+    let entities = this.entity.world.get_entities_at(this.entity.pos);
+    let other_unit = entities.find(e=>e.id != this.entity.id && (e instanceof Unit));
+    if(residence instanceof House && !other_unit) return residence;
+  }
+
+  is_possible(){
+    return super.is_possible() && this.get_house();
+  }
+
+  do(){
+    super.do();
+    if(Math.random()<REST_HEAL_PROB){
+      this.entity.heal(1);
+    }
+  }
+}
+
+
 
 export class Create extends Action {
 

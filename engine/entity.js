@@ -6,6 +6,8 @@ import {
   Defend,
   Repair,
   Reside,
+  Work,
+  Rest,
   Create,
 } from './action.js';
 import { New, Kill } from './events.js';
@@ -161,7 +163,7 @@ export class Unit extends Entity {
   constructor(pos, owner){
     super(pos, owner);
     this.creations = [House, Factory];
-    this.actions = [Create, Defend, Attack, Mine, Repair, Reside];
+    this.actions = [Create, Defend, Attack, Mine, Repair, Work, Rest];
   }
 
   get_force(){
