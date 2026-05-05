@@ -2,7 +2,7 @@ import {new_vector as V} from './vector.js';
 import {createNoise2D} from 'simplex-noise';
 import {Gold, Water, Unit} from './entity.js';
 import {find_path} from './path.js';
-const DEFAULT_SIZE = V(20, 15)
+const DEFAULT_SIZE = V(21, 15)
 const GOLD_NOISE_SCALE = 2.5;
 const GOLD_NOISE_THRESHOLD = .75;
 const WATER_NOISE_SCALE = .2;
@@ -22,8 +22,9 @@ export class World {
     const gold_noise = createNoise2D();
 
     const symetric = (pos) => this.size.subtract(pos).subtract(V(1,1));
+    
     const gold_at = (pos) => {
-      pos = pos.multiply (GOLD_NOISE_SCALE);
+      pos = pos.multiply(GOLD_NOISE_SCALE);
       let noise = ((1+gold_noise(pos.x,pos.y))/2);
       let gold_intensity = (noise-GOLD_NOISE_THRESHOLD)/(1-GOLD_NOISE_THRESHOLD)
       return Math.max(0, gold_intensity);
@@ -40,7 +41,7 @@ export class World {
       return level <= WATER_LEVEL;
     }
 
-
+    // Add Water
     for (var x = 0; x < this.size.x; x++) {
       for (var y = 0; y < this.size.y; y++) {
         let pos = V(x, y);
@@ -50,7 +51,8 @@ export class World {
       }
     }
 
-
+    
+    // Choose starting positions
     for (var x = 3; x < this.size.x-3; x++) {
       for (var y = 3; y < this.size.y-3; y++) {
         let pos = V(x,y);
@@ -63,32 +65,46 @@ export class World {
       }
       if(this.protected_path) break;
     }
-
+  
+    // Create a starting zone in the center if standard strategy fails
     if(!this.protected_path){
       let center = this.size.multiply(.5).floor();
       this.protected_path = [];
-      for (var x = center.x-1; x < center.x+1; x++) {
-        for (var y = center.y-1; y < center.y+1; y++) {
+      this.start_positions.push(center.add(V(-1,-1)));
+      this.start_positions.push(center.add(V(1,1)));
+      for (var x = center.x-1; x <= center.x+1; x++) {
+        for (var y = center.y-1; y <= center.y+1; y++) {
           let pos = V(x,y);
           this.protected_path.push(pos);
-          this.start_positions.push(pos);
+          
           this.entities = this.entities.filter(e=>!e.pos.equals(pos))
         }
       }
     }
 
+    // Add Gold
     for (var x = 0; x < this.size.x; x++) {
       for (var y = 0; y < this.size.y; y++) {
         let pos = V(x, y);
-
         let level = (gold_at(pos) + gold_at(symetric(pos)))/2
         if (level > 0 && this.is_spawnable(pos)){
           let gold = new Gold(pos)
-          gold.set_size(level)
+          if(this.start_positions.every(p=>p.manhattan(pos)>4)){
+            gold.set_size(level)
+          }
           this.add_entity(gold);
         }
       }
     }
+    
+    // Add a gold next to starting positions
+    let startingGoldPosition1 = this.start_positions[0].add(V(1,0));
+    this.entities = this.entities.filter(e=>!e.pos.equals(startingGoldPosition1));
+    this.add_entity(new Gold(startingGoldPosition1));
+    let startingGoldPosition2 = this.start_positions[1].add(V(-1,0));
+    this.entities = this.entities.filter(e=>!e.pos.equals(startingGoldPosition2));
+    this.add_entity(new Gold(startingGoldPosition2));
+
   }
 
   get_state(){

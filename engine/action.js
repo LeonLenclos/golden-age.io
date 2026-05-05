@@ -249,7 +249,10 @@ export class Create extends Action {
   get_pos(){
     if(this.entity instanceof Building) {
       let neighbors = this.entity.pos.neighbors();
-      return neighbors.find(p=>{
+      
+      const shuffle = arr => arr.map(value => ({ value, sort: Math.random()})).sort((a, b) => a.sort - b.sort).map(({ value }) => value)
+      
+      return shuffle(neighbors).find(p=>{
         let entities = this.entity.world.get_entities_at(p)
         if(!entities.length) return true;
         if(this.entity.creation instanceof Gold){

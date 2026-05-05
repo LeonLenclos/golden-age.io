@@ -201,17 +201,14 @@ export class Building extends Entity {
 
   constructor(pos, owner){
     super(pos, owner);
-    this.actions = [Create];
   }
 
   set_target(pos){
     this.get_resident()?.set_target(pos);
   }
 
-
   can_create(constructor){
     return super.can_create(constructor);
-
   }
 
   get_resident(){
@@ -237,6 +234,7 @@ export class House extends Building {
 
   constructor(pos, owner){
     super(pos, owner);
+    this.actions = [Create];
     this.creations = [Unit];
   }
 }
@@ -249,6 +247,5 @@ export class Factory extends Building {
 
   constructor(pos, owner){
     super(pos, owner);
-    this.creations = [Gold];
   }
 }
