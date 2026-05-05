@@ -1,7 +1,7 @@
 {
-  "name": "socket-chat-example",
+  "name": "golden-age",
   "version": "0.0.1",
-  "description": "my first socket.io app",
+  "description": "Multiplayer Online Real Time Strategy Game",
   "type": "module",
   "dependencies": {
     "a-star": "^0.2.0",
