@@ -337,8 +337,8 @@ Vue.component('arrow-path', {
             steps[steps.length-1].last = true;
             return steps;
         },
-        get_width(){return this.get_cell_size()*(this.size.x+1)},
-        get_height(){return this.get_cell_size()*(this.size.y+1)},
+        get_width(){return this.get_cell_size()*(this.size.x)},
+        get_height(){return this.get_cell_size()*(this.size.y)},
         get_cell_size(){return this.cell_size+1},
         get_view_box(){return `0 0 ${this.get_width()} ${this.get_height()}`},  
     },

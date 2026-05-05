@@ -46,10 +46,10 @@ Vue.component('player-name', {
     <span
       :class="{
         playername:true,
-        ally:player.id==$root.id,
-        enemy:player.id!=$root.id,
+        ally:player?.id==$root.id,
+        enemy:player?.id!=$root.id,
       }"
-    > {{player.name}} </span>
+    > {{player?.name}} </span>
   `
 });
 
@@ -74,7 +74,7 @@ Vue.component('room', {
   template: `
   <div id="room">
     <header>
-      <h2>{{room.name}}</h2>
+      <h2><small>{{room.name}}</small></h2>
       <button @click="$emit('quit_room')">quit</button>
     </header>
     <section class="roomstate">
@@ -84,8 +84,8 @@ Vue.component('room', {
     </section>
     <section class="players">
       <player-card
-        v-for="player in room.players"
-        :player="player"
+        v-for="i in 2"
+        :player="room.players[i-1]"
         ></player-card>
       </section>
   </div>
@@ -96,6 +96,9 @@ Vue.component('fill-bar', {
     props: ['value', 'max', 'percent'],
     methods:{
       get_text(){
+        if(this.value === undefined){
+          return '';
+        }
         if(this.percent){
           return `${Math.floor(this.value/this.max*100)}%`
 
@@ -166,12 +169,12 @@ Vue.component('player-card', {
   props: ['player', 'is_you'],
   template: `
 
-  <div class="playercard">
+  <div :class="{playercard:true, empty:player===undefined}">
     <header>
       <h2><player-name :player=player></player-name></h2>      
     </header>
     <main>
-      <fill-bar class="gold-bar" :value="player.gold" :max="player.gold_max"></fill-bar>
+      <fill-bar class="gold-bar" :value="player?.gold" :max="player?.gold_max"></fill-bar>
     </main>
   </div>
 
@@ -236,6 +239,7 @@ Vue.component('selection', {
 Vue.component('join-room', {
   data:function(){return {
     player:readCookie('playername')||'',
+    about:{}
   };},
   props:['invitation_id'],
   methods:{
@@ -245,14 +249,31 @@ Vue.component('join-room', {
     },
     play_private(){
       this.play(true);
+    },
+    async loadAbout() {
+ 
+      try {  
+        const response = await fetch('/about.json');  
+        if (!response.ok) throw new Error('Failed to fetch data');  
+        this.about = await response.json(); // Parse JSON  
+      } catch (err) {  
+        console.error(err.message)  
+      } finally {  
+        //this.isLoading = false;  
+      }  
     }
   },
+  mounted() {  
+    // Fetch JSON from public/ directory  
+    this.loadAbout();  
+  },  
   template: `
   <div
   class="fullscreen"
   id="join-room"
   @keyup.enter="play">
     <h1>Golden Age</h1>
+    <small>(Version {{about.version}})</small>
     <div>
       <label for="player">Your name</label>
       <input name="player" v-model="player"/>
@@ -343,7 +364,7 @@ Vue.component('end', {
     },
   },
   template: `
-  <div class="panel" id="end">
+  <div class="fullscreen" id="end">
     <small>{{get_reason()}}</small>
     <h2>{{get_status()}}</h2>
     <button @click="$emit('quit')">quit</button>
@@ -372,23 +393,20 @@ Vue.component('waiting', {
     }
   },
   template: `
-  <div class="panel" id="waiting">
-    <small v-if="room.private">You are in a private room, no one will come unless invited.</small>
-    <small v-else>You are in a public room, the first player to log in will join your room.</small>
+  <div class="fullscreen" id="waiting">
+  <h1>Waiting for a player...</h1>
+  <h2>{{room.name}}</h2>
+    <p v-if="room.private">You are in a private room, no one will come unless invited.</p>
+    <p v-else>You are in a public room, the first player to log in will join your room.</p>
 
-    <h2>Waiting for a player...</h2>
-
-    <div>
-      <small>Invite a friend by sending them this link: {{invite_link}}</small>
+    <h2>Invite a friend</h2>
+    <p>Invite a friend by sending them this link: {{invite_link}}</p>
       <button @click="copy_link" :disabled="copied">{{copied?'Link copied':'Copy link'}}</button>
-    </div>
 
-    <div>
-      <small>Invite a bot :</small>
+    <h2>Invite a bot</h2>
       <button @click="$emit('bot', 'hard')">hard</button>
       <button @click="$emit('bot', 'medium')">medium</button>
       <button @click="$emit('bot', 'easy')">easy</button>
-    </div>
   </div>
   `
 });

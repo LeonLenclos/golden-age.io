@@ -2,10 +2,14 @@
 <html>
 <head>
   <title>Golden Age</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/svg.css">
   <link rel="stylesheet" href="css/map.css">
+  <link rel="stylesheet" href="css/small.css">
+  <link rel="stylesheet" href="css/portrait.css">
+
 </head>
 <body>
   <main id="app">
@@ -27,39 +31,27 @@
     ></loading>
 
     <header v-if=room>
-      <room
-      :room=room
-      @quit_room=quit_room
-      ></room>
     </header>
+
+    <waiting
+    v-if="room?.playing=='not started'"
+      @bot="bot"
+      :room="room"
+    ></waiting>
+
+    <end
+    v-else-if="room?.playing=='ended'"
+    :status="who_is(id).victory.status"
+    :reason="who_is(id).victory.reason"
+    :rematch_propositions="room.rematch_propositions"
+    @rematch="rematch"
+    @quit="quit_room"
+    ></end>
 
     <main v-if=room>
       <aside>
-        <messages
-          ref="messages"
-          :messages="messages"
-          @send_message="send_message"
-        ></messages>
-        <inspector
-          :pos=inspected_pos
-          :entities="room.world?.entities.filter(e=>e.pos.x==inspected_pos.x && e.pos.y==inspected_pos.y)"
-        ></inspector>
-      </aside>
+        <room :room=room @quit_room=quit_room ></room>
 
-      <main-map
-        ref=map
-        :players="room?.players"
-        :world="room?.world"
-        :entities="filter_visible(room?.world.entities)"
-        :events="filter_visible(room?.world.events)"
-        :selection=selection
-        :cell_size="cell_size"
-        @inspect=inspect
-        @select=select
-        @target=target
-      ></main-map>
-
-      <aside>
         <div v-if="room.playing=='playing'" class="panel" id="selection">
           <div class="selection-actions">
             <button @click="unselect()" :disabled="selection==undefined">
@@ -76,21 +68,31 @@
             @creation=creation
           ></selection>
         </div>
-        <end
-          v-else-if="room?.playing=='ended'"
-          :status="who_is(id).victory.status"
-          :reason="who_is(id).victory.reason"
-          :rematch_propositions="room.rematch_propositions"
-          @rematch="rematch"
-          @quit="quit_room"
-        ></end>
-        <waiting
-        v-else-if="room?.playing=='not started'"
-          @bot="bot"
-          :room="room"
-        ></waiting>
+
         <div v-else class="panel"></div>
+
+          
+        <messages
+          ref="messages"
+          :messages="messages"
+          @send_message="send_message"
+        ></messages>
+
       </aside>
+
+      <main-map
+        ref=map
+        :players="room?.players"
+        :world="room?.world"
+        :entities="filter_visible(room?.world.entities)"
+        :events="filter_visible(room?.world.events)"
+        :selection=selection
+        :cell_size="cell_size"
+        @inspect=inspect
+        @select=select
+        @target=target
+      ></main-map>
+
 
     </main>
 

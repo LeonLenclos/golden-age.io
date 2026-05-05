@@ -67,16 +67,24 @@ var app = new Vue({
     on_resize(){
       let root = document.documentElement
       let map_margin = 2;//px
+      let app_padding = parseInt(getComputedStyle(root).getPropertyValue('--app-padding'));
 
       let width = this.$el.clientWidth;
+      let height = this.$el.clientHeight;
+
+      let portrait = height > width;
+
       let world_width =  20;//cells
       let aside_width = parseInt(getComputedStyle(root).getPropertyValue('--aside-width'));
-      let remaining_width = width-aside_width*2-map_margin*2;
-
-      let height = this.$el.clientHeight;
+      let remaining_width = width-aside_width-map_margin-app_padding*2;
+      if(portrait){
+        remaining_width = width;
+      }
       let world_height =  15;//cells
-      let header_height = parseInt(getComputedStyle(root).getPropertyValue('--header-height'));
-      let remaining_height = height-header_height-map_margin;
+      let remaining_height = height-app_padding*2;
+
+      // let header_height = parseInt(getComputedStyle(root).getPropertyValue('--header-height'));
+      // let remaining_height = height-header_height-map_margin;
 
       this.cell_size = Math.min(remaining_width/world_width, remaining_height/world_height);
       this.cell_size -= 1;

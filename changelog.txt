@@ -1,0 +1,8 @@
+VERSION 0.0.1 RELEASE
+
+Release date: May 5, 2026
+Version name: Alpha 1
+Version number: 0.0.1
+Abstract: First version of the game. The code is from late 2022, but I'm taking a snapshot of it in 2026 as I plan to revisit it.
+Changelog:
+- First Version

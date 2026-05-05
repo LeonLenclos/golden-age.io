@@ -1,0 +1,12 @@
+
+@media screen and (max-width: 640px),
+screen and (max-height: 640px) {
+
+    :root{
+        --app-padding : 1px;
+    }
+    body{
+        font-size: 9pt;
+    }
+
+}

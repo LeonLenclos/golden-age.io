@@ -17,9 +17,13 @@ const files_callback = (item, path) => {
 };
 
 const assets_tree = dir_tree('./public/assets', {attributes:["extension"]}, files_callback);
+import package_json from './package.json' with { type: "json" };
+
+
 
 app.use(express.static('./public'));
 app.get('/assets.json', (req, res) => res.send(assets_tree));
+app.get('/about.json', (req, res) => res.send({version:package_json.version}));
 app.get('/stat.json', (req, res) => res.send({rooms:rooms.length, players:players.length}));
 app.get('/history.json', (req, res) => {
   const room = req.query.room;
