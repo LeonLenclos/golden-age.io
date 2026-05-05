@@ -20,13 +20,15 @@ indent_mode=2
 [project]
 name=GoldenAge
 base_path=/home/leon/Projets/golden-age.io/
+description=
+file_patterns=
 
 [long line marker]
 long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=13
+current_page=21
 FILE_NAME_0=3242;Javascript;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fengine%2Faction.js;0;2
 FILE_NAME_1=3292;Javascript;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fengine%2Fentity.js;0;2
 FILE_NAME_2=387;Javascript;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fengine%2Fevents.js;0;2
@@ -40,13 +42,15 @@ FILE_NAME_9=0;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fpub
 FILE_NAME_10=0;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fpublic%2Freplay.html;0;2
 FILE_NAME_11=0;HTML;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fpublic%2Fhistory.html;0;2
 FILE_NAME_12=8828;Javascript;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fpublic%2Fjs%2Fmain.js;0;2
-FILE_NAME_13=6408;Javascript;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fpublic%2Fjs%2Fcomponents.js;0;2
+FILE_NAME_13=6144;Javascript;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fpublic%2Fjs%2Fcomponents.js;0;2
 FILE_NAME_14=109;Markdown;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2FREADME.md;0;2
 FILE_NAME_15=66;JSON;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fpackage.json;0;2
 FILE_NAME_16=0;JSON;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fpackage-lock.json;0;2
 FILE_NAME_17=20;None;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2FLICENSE;0;2
 FILE_NAME_18=250;None;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fchangelog.txt;0;2
 FILE_NAME_19=0;Javascript;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fpublic%2Fjs%2Fsvg-components.js;0;2
+FILE_NAME_20=0;None;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2Fprojet-geany;0;2
+FILE_NAME_21=13;None;0;EUTF-8;0;1;0;%2Fhome%2Fleon%2FProjets%2Fgolden-age.io%2F.gitignore;0;2
 
 [VTE]
 last_dir=/home/leon/Projets/golden-age.io
@@ -54,7 +58,7 @@ last_dir=/home/leon/Projets/golden-age.io
 [prjorg]
 source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;*.m;
 header_patterns=*.h;*.H;*.hpp;*.hxx;*.h++;*.hh;
-ignored_dirs_patterns=.*;CVS;
+ignored_dirs_patterns=
 ignored_file_patterns=*.o;*.obj;*.a;*.lib;*.so;*.dll;*.lo;*.la;*.class;*.jar;*.pyc;*.mo;*.gmo;
 generate_tag_prefs=0
 show_empty_dirs=true
