@@ -88,9 +88,9 @@ export class World {
         let pos = V(x, y);
         let level = (gold_at(pos) + gold_at(symetric(pos)))/2
         if (level > 0 && this.is_spawnable(pos)){
-          let gold = new Gold(pos)
+          let gold = new Gold(pos);
           if(this.start_positions.every(p=>p.manhattan(pos)>4)){
-            gold.set_size(level)
+            gold.set_size(level);
           }
           this.add_entity(gold);
         }
@@ -151,7 +151,8 @@ export class World {
   is_spawnable(pos){
     return this.is_free(pos)
       && !this.start_positions.some(p=>p.equals(pos))
-      && !this.protected_path.some(p=>p.equals(pos));
+      && !this.protected_path.some(p=>p.equals(pos))
+      && this.start_positions.some(p=>find_path(p, pos, this));
   }
 
   update(){
