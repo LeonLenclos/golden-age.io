@@ -196,6 +196,9 @@ export class Work extends Reside {
   do(){
     super.do();
     //let factory = this.get_factory();
+    if(this.entity.hp<=1){
+      return;
+    }
     this.entity.owner.gold ++;
     if(Math.random()<WORK_HIT_PROB){
       this.entity.hit(1);

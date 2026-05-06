@@ -97,6 +97,9 @@ export class Bot extends Player {
     let buildings_under_construction = allies.filter(a=> a instanceof Building && a.under_construction);
     let visibles = this.get_visible_entities();
     let golds = visibles.filter(e=>e instanceof Gold);
+    let factories = allies.filter(a=>a instanceof Factory);
+    let houses = allies.filter(a=>a instanceof House);
+    
 
     const nobody_s_entity = e => {
       let targeted = allies.find(a=>a.target?.equals(e.pos) && a.path?.length);
@@ -126,7 +129,23 @@ export class Bot extends Player {
     
     const send_to_gold = send_to_things(golds);
     const send_to_build = send_to_things(buildings_under_construction);
+    const send_to_factory = send_to_things(factories);
 
+    const send_to_rest = e =>{
+      const LOW_HP = 2
+      if(!(e instanceof Unit)) return false;
+      if(e.hp >= e.hp_max) return false;
+      let nobody_s_houses = houses.filter(nobody_s_entity);
+      let is_on_house = houses.some(v=>v.pos.equals(e.pos));
+      let is_going_to_house = is_walking(e) && houses.some(v=>v.pos.equals(e.target));
+      if(is_on_house || is_going_to_house ) return true;
+      if(e.hp > LOW_HP) return false;
+      if(! nobody_s_houses.length) return false;
+      let nearest_house = nearest(nobody_s_houses, e);
+      e.set_target(nearest_house.pos);
+      return true
+    }
+    
     const create_things = (thing_class) => (e) => {
       if(!e.creations.some(c=>c==thing_class)) return false;
       if(thing_class.cost > this.gold) return false;
@@ -191,36 +210,39 @@ export class Bot extends Player {
     let priority = [];
     switch (this.difficulty) {
       case HARD: priority = [
+        send_to_rest,
         help_ally,
         create_till_8_units,
-        create_gold,
         create_till_2_houses,
         create_till_2_factories,
         send_to_build,
         attack,
         send_to_gold,
+        send_to_factory,
         random_walk,
       ];
       break;
       case MEDIUM: priority = [
+        send_to_rest,
         help_ally,
         create_till_5_units,
-        create_gold,
         create_till_1_houses,
         create_till_1_factories,
         send_to_build,
         attack,
+        send_to_factory,
         send_to_gold,
         random_walk,
       ];
       break;
       case EASY: priority = [
+        send_to_rest,
         create_till_4_units,
-        create_gold,
         create_till_1_houses,
         create_till_1_factories,
         send_to_build,
         send_to_gold,
+        send_to_factory,
         random_walk,
       ];
       break;
