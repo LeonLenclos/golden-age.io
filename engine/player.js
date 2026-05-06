@@ -2,7 +2,7 @@ import {House, Factory, Gold, Unit, Building, Water} from './entity.js';
 
 const DEFAULT_PLAYER_NAME = 'someone';
 const GOLD_MAX = 500;
-const GOLD_START = 20;
+const GOLD_START = 10;
 
 const HARD = 'hard';
 const MEDIUM = 'medium';

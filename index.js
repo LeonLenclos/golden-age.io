@@ -6,6 +6,7 @@ import dir_tree from 'directory-tree';
 import {rooms, history, get_private_room, get_public_room, get_room_by_id} from './engine/room.js';
 import {players, new_player, remove_player, get_player} from './engine/player.js';
 import {new_vector as V} from './engine/vector.js';
+import {execute_cheat_codes, list_cheat_codes} from './engine/cheat.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -24,6 +25,8 @@ import package_json from './package.json' with { type: "json" };
 app.use(express.static('./public'));
 app.get('/assets.json', (req, res) => res.send(assets_tree));
 app.get('/about.json', (req, res) => res.send({version:package_json.version}));
+
+app.get('/cheatcodes.json', (req, res) => res.send(list_cheat_codes()));
 app.get('/stat.json', (req, res) => res.send({rooms:rooms.length, players:players.length}));
 app.get('/history.json', (req, res) => {
   const room = req.query.room;
@@ -40,29 +43,11 @@ function send_message(room, msg, emiter){
   io.to(room.id).emit('msg', msg, emiter);
 }
 
-function cheat(player, msg){
-  switch (msg) {
-    case '!FREEGOLD':
-      player.gold += 100;
-      break;
-    case '!GOGOLD':
-      player.gold += 500;
-      break;
-    case '!NOFOG':
-      player.room.fog_of_war = false;
-      break;
-    case '!STOPTIME':
-      player.room.turn_increment = 0;
-      break;
-    case '!':
-      player.room.fog_of_war = false;
-      player.room.add_bot();
-      break;
-    default:
-      return false;
+function cheat(msg, player){
+  if(execute_cheat_codes(msg, player)){
+    send_message(player.room, `${player.name} is cheating !`)
+    return true;
   }
-  send_message(player.room, `${player.name} is cheating !`)
-  return true;
 }
 
 io.on('connection', (socket) => {
@@ -108,7 +93,7 @@ io.on('connection', (socket) => {
   socket.on('msg', (msg) => {
     let player = get_player(socket.id);
     if(!player) return;
-    if(cheat(player, msg)) return;
+    if(cheat(msg, player)) return;
     send_message(player.room, msg, player.id);
   });
 

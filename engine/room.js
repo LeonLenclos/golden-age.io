@@ -50,6 +50,8 @@ export function close_room(id) {
   rooms = rooms.filter(r=>r.id != id);
 }
 
+
+
 export class History {
   constructor(room){
     this.turns = [];
@@ -102,8 +104,13 @@ export class Room {
     this.players = [];
     this.private = false;
     this.reset();
-    this.turn_interval_id = setInterval(()=>{this.update()}, TURN_INTERVAL_TIME)
+    this.start_clock(TURN_INTERVAL_TIME);
     rooms.push(this);
+  }
+
+  start_clock(turn_interval_time){
+    clearInterval(this.turn_interval_id);
+    this.turn_interval_id = setInterval(()=>{this.update()}, turn_interval_time)
   }
 
   reset(){
@@ -113,6 +120,7 @@ export class Room {
     this.turn_max = TURN_MAX;
     this.playing = NOT_STARTED;
     this.fog_of_war = true;
+    this.peace_mode = false;
     this.turn_increment = 1;
     this.rematch_propositions = new Set();
     this.players.forEach(player => player.reset());
@@ -182,7 +190,11 @@ export class Room {
   victory_condition(){
     let winner = undefined;
     let victory = undefined;
-    if(this.players.length == 1){
+    
+    if(this.peace_mode){
+      return false;
+    }
+    else if(this.players.length == 1){
       winner = this.players[0];
       victory = CONCEDE;
     }

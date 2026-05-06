@@ -230,7 +230,7 @@ export class Building extends Entity {
 export class House extends Building {
   static type = 'house';
   static hp = 10;
-  static cost = 20;
+  static cost = 10;
 
   constructor(pos, owner){
     super(pos, owner);
@@ -243,7 +243,7 @@ export class House extends Building {
 export class Factory extends Building {
   static type = 'factory';
   static hp = 10;
-  static cost = 20;
+  static cost = 10;
 
   constructor(pos, owner){
     super(pos, owner);
