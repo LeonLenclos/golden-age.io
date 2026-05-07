@@ -56,15 +56,17 @@ io.on('connection', (socket) => {
 
   socket.on('join', (data) => {
     let room;
-    if(data.room) room = get_room_by_id(data.room, io);
+    if(data.room){
+      room = get_room_by_id(data.room, io);
+      if(!room) {
+        socket.emit('room_not_found', data.room);
+        return;
+      }
+    }
     else if(data.private) room = get_private_room(io);
     else room = get_public_room(io);
 
     
-    if(!room) {
-      socket.emit('room_not_found');
-      return;
-    }
 
     let player = new_player(data.player, socket.id);
     socket.join(room.id);
@@ -117,6 +119,7 @@ io.on('connection', (socket) => {
     socket.leave(room.id)
     player.quit();
     remove_player(socket.id);
+    socket.emit('room_quited');
     send_message(room, `${player.name} quited the room`);
   });
 

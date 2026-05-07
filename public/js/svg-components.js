@@ -1,4 +1,4 @@
-Vue.component('entity', {
+export const entity =  {
     data(){return{
         frame:0,
     }},
@@ -23,7 +23,7 @@ Vue.component('entity', {
         },
         ally_or_enemy(){
             if(!this.entity.owner) return;
-            if(this.entity.owner == this.$root.id){
+            if(this.entity.owner == this.$root.player_id){
                 return 'ally'
             }
             return 'enemy'
@@ -47,8 +47,8 @@ Vue.component('entity', {
         :class="{
             entity : true,
             selected:selected,
-            ally: entity.owner == $root.id,
-            enemy: entity.owner != $root.id,
+            ally: entity.owner == $root.player_id,
+            enemy: entity.owner != $root.player_id,
             water: entity.type=='water',
             movingfromleft:moving_from(-1, 0),
             movingfromright:moving_from(1, 0),
@@ -218,10 +218,9 @@ Vue.component('entity', {
 
     
     `
-});
+};
 
-
-Vue.component('event', {
+export const event = {
     data(){return{
         frame:0,
     }},
@@ -269,11 +268,9 @@ Vue.component('event', {
     </g>
     </svg>
     `
-});
+};
 
-
-
-Vue.component('arrow', {
+export const arrow = {
     data(){
       return{
       };
@@ -310,11 +307,9 @@ Vue.component('arrow', {
     ></line>
   </svg>
   `
-  });
-  
+  };
 
-  
-Vue.component('arrow-path', {
+export const arrow_path = {
     data(){
       return{
       };
@@ -368,6 +363,6 @@ Vue.component('arrow-path', {
         ></line>
     </svg>
    `
-  });
+  };
   
   

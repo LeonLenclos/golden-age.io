@@ -9,10 +9,31 @@
   <link rel="stylesheet" href="css/map.css">
   <link rel="stylesheet" href="css/small.css">
   <link rel="stylesheet" href="css/portrait.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/lib/howler.js"></script>
+  <script src="js/lib/vector.js"></script>
+  <script src="js/lib/cookies.js"></script>
+  <!--
+  <script src="js/lib/vue.js"></script>
+  -->
+  
+  <script type="importmap">
+  {
+    "imports": {
+      "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js",
+      "socket": "./js/socket.js",
+      "components": "./js/components.js",
+      "svg-components": "./js/svg-components.js",
+      "app": "./js/app.js"
+    }
+  }
+  </script>
 
+  <script type="module" src="js/main.js"></script>
+  
 </head>
-<body>
-  <main id="app">
+<body id="app-container" >
+  <main id="app" ref="main">
 
     <!-- <start
       v-if="!started"
@@ -41,8 +62,8 @@
 
     <end
     v-else-if="room?.playing=='ended'"
-    :status="who_is(id).victory.status"
-    :reason="who_is(id).victory.reason"
+    :status="who_is(player_id).victory.status"
+    :reason="who_is(player_id).victory.reason"
     :rematch_propositions="room.rematch_propositions"
     @rematch="rematch"
     @quit="quit_room"
@@ -91,9 +112,13 @@
         ref=map
         :players="room?.players"
         :world="room?.world"
+        :fog_of_war="room?.fog_of_war"
+        :turn="room?.turn"
         :entities="filter_visible(room?.world.entities)"
+        :allies="room?.world.entities.filter(e=>e.owner==player_id)"
         :events="filter_visible(room?.world.events)"
         :selection=selection
+        :inspected_pos="inspected_pos"
         :cell_size="cell_size"
         @inspect=inspect
         @select=select
@@ -104,13 +129,5 @@
     </main>
 
   </main>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="js/lib/howler.js"></script>
-  <script src="js/lib/vector.js"></script>
-  <script src="js/lib/cookies.js"></script>
-  <script src="js/lib/vue.js"></script>
-  <script src="js/components.js"></script>
-  <script src="js/svg-components.js"></script>
-  <script src="js/main.js"></script>
 </body>
 </html>

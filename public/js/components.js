@@ -1,10 +1,12 @@
-Vue.component('messages', {
+import {ref} from 'vue';
+
+export const messages = {
   data(){
     return {
       input:'',
     };
   },
-  props: ['messages'],
+  props: ['messages', 'players'],
   updated() {
     this.$refs.list.scroll({
       top: this.$refs.list.scrollHeight,
@@ -27,7 +29,7 @@ Vue.component('messages', {
       <li v-for="message in messages">
         <player-name
           v-if="message.emiter"
-          :player="$root.who_is(message.emiter)"
+          :player="players.find(p=>p.id==message.emiter)"
         ></player-name>
         <span>{{message.msg}}</span>
       </li>
@@ -38,38 +40,36 @@ Vue.component('messages', {
     </form>
   </div>
   `
-});
+};
 
-Vue.component('player-name', {
-  props: ['player'],
+export const player_name = {
+  props: ['player', 'player_id'],
   template: `
     <span
       :class="{
         playername:true,
-        ally:player?.id==$root.id,
-        enemy:player?.id!=$root.id,
+        ally:player?.id==$root.player_id,
+        enemy:player?.id!=$root.player_id,
       }"
     > {{player?.name}} </span>
   `
-});
+};
 
-
-Vue.component('entity-name', {
+export const entity_name = {
   props: ['entity'],
   template: `
     <span
       v-if="entity"
       :class="{
         entityname:true,
-        ally:entity.owner==$root.id,
-        enemy:entity.owner!=$root.id,
+        ally:entity.owner==$root.player_id,
+        enemy:entity.owner!=$root.player_id,
       }"
     > {{entity.type}} </span>
   `
-});
+};
 
-
-Vue.component('room', {
+export const room = {
   props: ['room'],
   template: `
   <div id="room">
@@ -90,9 +90,9 @@ Vue.component('room', {
       </section>
   </div>
   `
-});
+};
 
-Vue.component('fill-bar', {
+export const fill_bar = {
     props: ['value', 'max', 'percent'],
     methods:{
       get_text(){
@@ -112,9 +112,9 @@ Vue.component('fill-bar', {
       <div class="label">{{get_text()}}</div>
     </div>
     `
-});
+};
 
-Vue.component('entity-card', {
+export const entity_card = {
   props: ['entity'],
   template: `
   <div class="card">
@@ -130,14 +130,14 @@ Vue.component('entity-card', {
     </main>
   </div>
   `
-});
+};
 
-Vue.component('creation-card', {
+export const creation_card = {
   props: ['creation','index'],
   methods:{
     entity()
     {
-      return {type:this.creation.type, owner:this.$root.id};
+      return {type:this.creation.type, owner:this.$root.player_id};
     },
     hint(){
       const hints = {
@@ -161,10 +161,9 @@ Vue.component('creation-card', {
     <span class="shortcut">{{['A or Q', 'Z or W'][index]}}</span>
   </button>
   `
-});
+};
 
-
-Vue.component('player-card', {
+export const player_card = {
   props: ['player', 'is_you'],
   template: `
 
@@ -178,11 +177,9 @@ Vue.component('player-card', {
   </div>
 
   `
-});
+};
 
-
-
-Vue.component('inspector', {
+export const inspector = {
   props: ['pos', 'entities'],
   template: `
   <div class="panel" id="inspector">
@@ -193,9 +190,9 @@ Vue.component('inspector', {
     </div>
   </div>
   `
-});
+};
 
-Vue.component('panel-col',{
+export const panel_col = {
     props:['title'],
     template: `
     <div class="panelcol">
@@ -205,9 +202,9 @@ Vue.component('panel-col',{
       </main>
     </div>
     `
-});
+};
 
-Vue.component('selection', {
+export const selection = {
   props: ['selection'],
   methods:{},
   template: `
@@ -217,9 +214,9 @@ Vue.component('selection', {
     </panel-col>
   </div>
   `
-});
+};
 
-Vue.component('creations', {
+export const creations = {
   props: ['creations'],
   methods:{},
   template: `
@@ -237,19 +234,18 @@ Vue.component('creations', {
 
   </div>
   `
-});
+};
 
-
-Vue.component('join-room', {
+export const join_room = {
   data:function(){return {
     player:readCookie('playername')||'',
     about:{}
   };},
   props:['invitation_id'],
   methods:{
-    play(private){
+    play(private_room){
       createCookie('playername', this.player)
-      this.$emit('join_room', this.player, private);
+      this.$emit('join_room', this.player, private_room);
     },
     play_private(){
       this.play(true);
@@ -295,9 +291,9 @@ Vue.component('join-room', {
     </div>
   </div>
     `
-});
+};
 
-Vue.component('loading', {
+export const loading = {
 
   props:['progress'],
 
@@ -308,20 +304,20 @@ Vue.component('loading', {
     <h2 v-if="progress==1">Waiting for server response...</h2>
     </div>
     `
-});
+};
 
-Vue.component('start', {
+export const start = {
   template: `
   <div class="fullscreen" id="start">
     <h1>Golden Age</h1>
     <button @click="$emit('start')">start</button>
   </div>
     `
-});
+};
 
-Vue.component('end', {
+export const end = {
   data(){return{
-    history_link:'/history.html?room='+this.$root.room.id+'&match='+this.$root.room.match+'&player='+this.$root.id,
+    history_link:'/history.html?room='+this.$root.room.id+'&match='+this.$root.room.match+'&player='+this.$root.player_id,
   }},
   props: ['status', 'reason', 'rematch_propositions'],
   methods: {
@@ -361,7 +357,7 @@ Vue.component('end', {
       return sentences[this.status];
     },
     i_want_rematch(){
-      return this.rematch_propositions.indexOf(this.$root.id) >= 0;
+      return this.rematch_propositions.indexOf(this.$root.player_id) >= 0;
     },
     oponent_want_rematch(){
       return this.rematch_propositions.length && !this.i_want_rematch();
@@ -379,9 +375,9 @@ Vue.component('end', {
   </div>
   `
 
-});
+};
 
-Vue.component('waiting', {
+export const waiting = {
   data(){return{
     invite_link:window.location.origin+'/?room='+this.$root.room.id,
     copied:false
@@ -413,33 +409,34 @@ Vue.component('waiting', {
       <button @click="$emit('bot', 'easy')">easy</button>
   </div>
   `
-});
+};
 
-
-Vue.component('main-map', {
+export const main_map = {
   data(){
     return {
       dragging:false,
       drag_from:{x:0,y:0},
       map_pos:{x:0,y:0},
       hover_pos:undefined,
-      allies:[],
       unvisited:undefined,
     };
   },
   props: [
     'entities',
+    'allies',
     'events',
     'players',
     'world',
+    'fog_of_war',
     'selection',
-    'cell_size'
+    'inspected_pos',
+    'cell_size',
+    'turn',
   ],
   watch:{
     entities(new_entities){
       if(!new_entities) return;
       if(this.unvisited) this.unvisited = this.unvisited.filter(pos=>!this.is_visible(pos))
-      this.allies = new_entities.filter(e=>e.owner==this.$root.id);
     }
   },
   methods:{
@@ -458,6 +455,12 @@ Vue.component('main-map', {
       // console.log('visited', !this.unvisited.some(p=>p.x==pos.x && p.y==pos.y))
       return !this.unvisited.some(p=>p.x==pos.x && p.y==pos.y)
     },
+    is_inspected(pos){
+      return this.inspected_pos.x == pos.x && this.inspected_pos.y == pos.y;
+    },
+    is_selected(pos){
+      return this.get_selected().some(e=>e.pos.x==pos.x && e.pos.y==pos.y);
+    },
     get_selected(){
       return this.entities.filter(e=>this.selection.includes(e.id))
     },
@@ -474,27 +477,27 @@ Vue.component('main-map', {
       return this.allies.some(e=>e.pos.x==pos.x && e.pos.y==pos.y);
     },
     is_visible(pos){
-      if(!this.$root.room.fog_of_war) return true;
+      if(!this.fog_of_war) return true;
       return this.allies.some(e=>Math.abs(pos.x-e.pos.x)+Math.abs(pos.y-e.pos.y)<4);
     },
     intro_visibility(pos){
       const manhattan = (a, b) => Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
       let center  = {x:this.world.size.x/2-.5, y:this.world.size.y/2-1/2}
       let intro = 1-manhattan(pos, center)/manhattan(center, this.world.size);
-      intro = intro*5 - this.$root.room.turn;
+      intro = intro*5 - this.turn;
       intro /= 15
       intro = Math.floor(intro*6)/6;
-      if(this.$root.room.turn == -10) return 1;
+      if(this.turn == -10) return 1;
       return intro;
     },
     visibility(pos){
       const manhattan = (a, b) => Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
-      shortest_dist = this.allies.reduce((dist, e)=>{return Math.min(dist, manhattan(pos, e.pos))}, 4);
+      let shortest_dist = this.allies.reduce((dist, e)=>{return Math.min(dist, manhattan(pos, e.pos))}, 4);
       // let v = (shortest_dist/4)**3;
-      if(this.$root.room.turn < 0) return this.intro_visibility(pos);
+      if(this.turn < 0) return this.intro_visibility(pos);
       if(shortest_dist<3) return 1;
       if(shortest_dist==3) return .85;
-      if(!this.$root.room.fog_of_war) return .7;
+      if(!this.fog_of_war) return .7;
       return 0;
     },
     on_mouse_enter(pos){
@@ -510,11 +513,11 @@ Vue.component('main-map', {
       if(!pos || !this.selection) return false;
       // can't target itself
       if(this.allies_at(pos).some(e=>this.selection.includes(e.id))) return false;
-      let entities = this.$root.what_are(this.selection);
+      let selected_entities = this.entities.filter(e=>this.selection.includes(e.id));
       // can't target if selection does not exists
-      if(!entities) return false;
+      if(!selected_entities) return false;
       // can't target if selection is an empty bulding
-      if(entities.every(e=>e.building && !this.allies_at(e.pos).some(ee=>!ee.building)))  return false;
+      if(selected_entities.every(e=>e.building && !this.allies_at(e.pos).some(ee=>!ee.building)))  return false;
       return true
     },
     on_click(pos){
@@ -571,8 +574,11 @@ Vue.component('main-map', {
             :visible="is_visible({x,y})"
             :visibility="visibility({x, y})"
             :visited="is_visited({x,y})"
+            :selected="is_selected({x,y})"
             :pos="{x,y}"
+            :turn="turn"
             :entities="entities_at({x,y})"
+            :selection="selection"
             :events="events_at({x,y})"
           ></cell>
         </td>
@@ -599,15 +605,18 @@ Vue.component('main-map', {
 
   </div>
   `
-});
+};
 
-Vue.component('cell', {
+export const cell = {
   props: [
     'pos',
+    'turn',
     'entities',
+    'selection',
     'events',
     'visible',
     'visited',
+    'inspected',
     'visibility'
   ],
   methods:{
@@ -618,21 +627,18 @@ Vue.component('cell', {
       return this.zindex(entity_a) - this.zindex(entity_b)
     },
     is_selected(entity){
-      return this.$root.selection==entity.id
+      return this.selection.includes(entity.id)
     },
-    is_inspected(){
-      return this.$root.inspected_pos.x == this.pos.x && this.$root.inspected_pos.y == this.pos.y;
-    }
   },
   template: `
-  <div :class="{cell:true, inspected:is_inspected(), visible:visible}">
+  <div :class="{cell:true, inspected:inspected, visible:visible}">
 
 
   <entity
     v-if=visible
     v-for="entity in entities?.sort(sorting)"
     :entity=entity
-    :turn=$root.room.turn
+    :turn=turn
     :selected="is_selected(entity)"
     draggable="false"
   />
@@ -640,7 +646,7 @@ Vue.component('cell', {
     v-else-if="visited"
     v-for="entity in entities?.sort(sorting)"
     :entity=entity
-    :turn=$root.room.turn
+    :turn=turn
     :selected="is_selected(entity)"
     draggable="false"
   />
@@ -650,7 +656,7 @@ Vue.component('cell', {
       v-if=visible
       v-for="event in events"
       :event=event
-      :turn=$root.room.turn
+      :turn=turn
       draggable="false"
     />
 
@@ -659,4 +665,4 @@ Vue.component('cell', {
 
   </div>
     `
-});
+};
