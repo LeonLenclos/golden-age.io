@@ -415,7 +415,8 @@ export const main_map = {
   data(){
     return {
       dragging:false,
-      drag_from:{x:0,y:0},
+      drag_from:{},
+      drag_to:{},
       map_pos:{x:0,y:0},
       hover_pos:undefined,
       unvisited:undefined,
@@ -529,20 +530,35 @@ export const main_map = {
       }
 
     },
-    start_drag(event){
+    on_left_click(pos){
+       this.$emit('select', pos);
+    },
+    on_right_click(pos){
+      this.$emit('target', pos);
+    },
+    on_shift_left_click(pos){
+      console.log("shift");
+       this.$emit('select_add', pos);
+    },
+    on_shift_right_click(pos){
+      
+    },
+    on_mouse_down(event){
       this.dragging=true;
       this.drag_from={x:event.clientX, y:event.clientY}
     },
-    stop_drag(event){
+    on_mouse_up(event){
       this.dragging=false;
     },
-    drag(event){
+    on_mouse_move(event){
       if(this.dragging){
         let drag_to={x:event.clientX, y:event.clientY}
         this.move(drag_to.x-this.drag_from.x, drag_to.y-this.drag_from.y);
         this.drag_from=drag_to;
       }
     },
+  
+
   move(x,y){
     this.map_pos.x += x;
     this.map_pos.y += y;
@@ -553,10 +569,10 @@ export const main_map = {
   template: `
   <div
     id="map"
-    @mousedown="start_drag"
-    @mouseleave="stop_drag"
-    @mouseup="stop_drag"
-    @mousemove="drag"
+    @mousedown="on_mouse_down"
+    @mouseleave="on_mouse_leave"
+    @mouseup="on_mouse_up"
+    @mousemove="on_mouse_move"
     >
 
     <table
@@ -567,7 +583,9 @@ export const main_map = {
           v-for="_, x in world.size.x"
           @mouseenter="on_mouse_enter({x,y})"
           @mouseleave="on_mouse_leave()"
-          @click.left="on_click({x,y})"
+          @click.left.exact="on_left_click({x,y})"
+          @click.right.exact.prevent="on_right_click({x,y})"
+          @click.left.shift.exact="on_shift_left_click({x,y})"
         >
           <cell
             :class="{target:selection, select:is_ally_at({x, y})}"

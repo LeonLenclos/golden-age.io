@@ -195,11 +195,14 @@ export const app = {
       this.inspected_pos=pos;
     },
     select(pos){
+      console.log('select');
       let entities = this.room.world.entities.filter(e=>
         e.pos.x==pos.x && e.pos.y==pos.y
         && e.owner==this.player_id
       );
-      if(entities.length == 0) return;   
+      if(entities.length == 0) {
+        this.unselect();
+      }
       if(this.selection.length==entities.length
         && entities.every(e=>this.selection.includes(e.id))){
         this.unselect();
@@ -209,6 +212,26 @@ export const app = {
         this.selection = entities.map(e=>e.id);
         this.play_sound('ui-select', 3);
       }
+    },
+    select_add(pos){
+            console.log("select_add");
+
+      let entities = this.room.world.entities.filter(e=>
+        e.pos.x==pos.x && e.pos.y==pos.y
+        && e.owner==this.player_id
+      );
+      if(entities.length == 0) return;
+      let already_selected = entities.filter(e=>this.selection.includes(e.id));
+      let not_already_selected = entities.filter(e=>!this.selection.includes(e.id));
+      entities.forEach(e=>{
+        if(this.selection.includes(e.id)){
+          this.selection = this.selection.filter(id=>id==e.id);
+        } else {
+          this.selection.push(e.id);
+        }
+        
+      });
+
     },
     unselect(){
       if(!this.selection) return;
