@@ -36,6 +36,7 @@ export class Entity {
   set_creation(type){
     if(this.creation) return;
     let constructor = this.creations.find(A=>A.type == type);
+    if(!constructor) return;
     if(!this.can_create(constructor)) return;
     this.creation = new constructor(this.pos, this.owner);
     this.creation.start_construction();

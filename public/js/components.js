@@ -84,8 +84,8 @@ Vue.component('room', {
     </section>
     <section class="players">
       <player-card
-        v-for="i in 2"
-        :player="room.players[i-1]"
+        v-for="index in 2"
+        :player="room.players[index-1]"
         ></player-card>
       </section>
   </div>
@@ -140,7 +140,6 @@ Vue.component('creation-card', {
       return {type:this.creation.type, owner:this.$root.id};
     },
     hint(){
-      console.log(this.creation)
       const hints = {
         gold:'Can be mined for gold',
         unit:'Can mine, fight and build',
@@ -209,18 +208,22 @@ Vue.component('panel-col',{
 });
 
 Vue.component('selection', {
-  props: ['selection', 'creations', 'mission'],
-  methods:{
-    mission_select(item){
-      this.$emit('mission_select', item);
-    }
-  },
+  props: ['selection'],
+  methods:{},
   template: `
   <div>
-    <panel-col title="selected entity">
-        <entity-card v-if="selection" :entity="selection"></entity-card>
+    <panel-col title="selected entities">
+        <entity-card v-for="entity in selection" :entity="entity"></entity-card>
     </panel-col>
+  </div>
+  `
+});
 
+Vue.component('creations', {
+  props: ['creations'],
+  methods:{},
+  template: `
+  <div>
     <panel-col title="creations">
       <div class="creations">
       <creation-card
@@ -235,6 +238,7 @@ Vue.component('selection', {
   </div>
   `
 });
+
 
 Vue.component('join-room', {
   data:function(){return {
@@ -455,7 +459,7 @@ Vue.component('main-map', {
       return !this.unvisited.some(p=>p.x==pos.x && p.y==pos.y)
     },
     get_selected(){
-      return this.entities.find(e=>e.id==this.selection)
+      return this.entities.filter(e=>this.selection.includes(e.id))
     },
     entities_at(pos){
       return this.entities.filter(e=>e.pos.x==pos.x && e.pos.y==pos.y);
@@ -505,12 +509,12 @@ Vue.component('main-map', {
       // need target pos and selection
       if(!pos || !this.selection) return false;
       // can't target itself
-      if(this.allies_at(pos).some(e=>e.id == this.selection)) return false;
-      let entity = this.$root.what_is(this.selection);
+      if(this.allies_at(pos).some(e=>this.selection.includes(e.id))) return false;
+      let entities = this.$root.what_are(this.selection);
       // can't target if selection does not exists
-      if(!entity) return false;
+      if(!entities) return false;
       // can't target if selection is an empty bulding
-      if(entity.building && !this.allies_at(entity.pos).some(e=>!e.building)) return false;
+      if(entities.every(e=>e.building && !this.allies_at(e.pos).some(ee=>!ee.building)))  return false;
       return true
     },
     on_click(pos){
@@ -585,7 +589,8 @@ Vue.component('main-map', {
     ></arrow-path>
     <arrow
     v-if="is_targetable(hover_pos)"
-    :start="get_selected().pos"
+    v-for="selection in get_selected()"
+    :start="selection.pos"
     :end="hover_pos"
     :size="world.size"
     :cell_size="cell_size"
@@ -655,13 +660,3 @@ Vue.component('cell', {
   </div>
     `
 });
-
-/*
-    <entity-img
-      v-if=visible
-      v-for="entity in entities?.sort(sorting)"
-      :entity=entity
-      :selected="is_selected(entity)"
-      draggable="false"
-    />
-*/

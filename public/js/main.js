@@ -6,7 +6,8 @@ var app = new Vue({
     // started:false,
     id:undefined,
     target_id:undefined,
-    selection:undefined,
+    selection:[],
+    creations:[],
     joining:false,
     selection_index: 0,
     inspected_pos:{},
@@ -194,43 +195,42 @@ var app = new Vue({
         e.pos.x==pos.x && e.pos.y==pos.y
         && e.owner==this.id
       );
-      if(entities.length == 0) return;
-      let entity = entities.find(e=>e.building) || entities[0]
-      if(!entity) return;
-      
-      if(entity.id == this.selection){
+      if(entities.length == 0) return;   
+      if(this.selection.length==entities.length
+        && entities.every(e=>this.selection.includes(e.id))){
         this.unselect();
       }
+      
       else {
+        this.selection = entities.map(e=>e.id);
         this.play_sound('ui-select', 3);
-        this.selection = entity?.id;
       }
     },
     unselect(){
       if(!this.selection) return;
+      this.selection =  [];
       this.play_sound('ui-select', 3);
-      this.selection = undefined;
     },
     select_next(){
       if(!this.room?.world) return;
       let allies = this.room.world.entities.filter(e=>e.owner==this.id);
       if(allies.length == 0) return;
 
-      this.play_sound('ui-select', 3);
-      this.selection = allies[this.selection_index%allies.length].id;
+      this.selection = [allies[this.selection_index%allies.length].id];
       this.selection_index ++;
+      this.play_sound('ui-select', 3);
     },
     creation(type){
       if(!this.selection) return;
-      socket.emit('creation', this.selection, type);
+      this.selection.forEach(e=>socket.emit('creation', e, type));
+      this.selection = [];
       this.play_sound('ui-target', 3);
-      this.selection = undefined;
     },
     target(pos){
       if(!this.selection) return;
-      socket.emit('target', this.selection, pos);
+      this.selection.forEach(e=>socket.emit('target', e, pos));
+      this.selection = [];
       this.play_sound('ui-target', 3);
-      this.selection = undefined;
     },
     filter_visible(objects){
       objects = objects || this.room?.world.entities;
@@ -250,28 +250,21 @@ var app = new Vue({
     what_is(id){
       return this.room?.world.entities.find(e=>e.id==id);
     },
+    what_are(arr){
+      return arr.map(id=>this.what_is(id));
+    },
     on_keyup(e){
-      let creations = this.what_is(this.selection)?.creations;
-      switch (e.key) {
-        case 'a':
-        case 'q':
-          if(!creations || !creations[0].possible) break;
-          this.creation(creations[0].type)
-          break;
-        case 'z':
-        case 'w':
-          if(!creations || !creations[1].possible) break;
-          this.creation(creations[1].type)
-          break;
-        case ',':
-          this.select_next();
-          break;
-        case ' ':
-          this.unselect();
-          break;
-        case 'Enter':
-          this.$refs.messages.give_focus();
-          break;  
+      //let creations = this.what_is(this.selection)?.creations;
+      switch (e.code) {
+          /*if(!creations || !creations[0].possible) break;
+          this.creation(creations[0].type)*/
+         
+        case 'Digit1': this.creation('house'); break;
+        case 'Digit2': this.creation('factory'); break;
+        case 'Digit3': this.creation('unit'); break;
+        case ',':      this.select_next(); break;
+        case ' ':      this.unselect(); break;
+        case 'Enter':  this.$refs.messages.give_focus(); break;  
         default:
           return true;
       }

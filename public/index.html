@@ -62,11 +62,18 @@
             </button>
           </div>
           <selection
-            :selection="what_is(selection)"
-            :creations="what_is(selection)?.creations"
-            :mission="what_is(selection)?.mission"
-            @creation=creation
+            :selection="what_are(selection)"
           ></selection>
+          
+          <creations
+            :creations="creations"
+            @creation=creation
+          ></creations>
+          
+          
+          
+                      
+
         </div>
 
         <div v-else class="panel"></div>
