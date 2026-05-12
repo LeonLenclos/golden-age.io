@@ -19,10 +19,12 @@ export const app = {
     messages(){return state.messages},
     room(){return state.room},
     rooms_not_found(){return state.rooms_not_found},
+    selected_types(){return room?.world?.entities.filter(e=>this.selection.includes(e.id)).map(e=>e.type) || []}
   },
   mounted: function () {
     const urlParams = new URLSearchParams(window.location.search);
     this.target_id = urlParams.get('room')
+    if(this.target_id == 'test') this.join_room('test', 'test');
     document.addEventListener('keyup', (e)=>{return this.on_keyup(e)});
     window.addEventListener('resize', (e)=>{this.on_resize(e)});
     this.on_resize();
@@ -220,18 +222,32 @@ export const app = {
         e.pos.x==pos.x && e.pos.y==pos.y
         && e.owner==this.player_id
       );
-      if(entities.length == 0) return;
-      let already_selected = entities.filter(e=>this.selection.includes(e.id));
-      let not_already_selected = entities.filter(e=>!this.selection.includes(e.id));
       entities.forEach(e=>{
         if(this.selection.includes(e.id)){
-          this.selection = this.selection.filter(id=>id==e.id);
+          this.selection = this.selection.filter(id=>id!=e.id);
         } else {
           this.selection.push(e.id);
         }
-        
       });
-
+    },
+    
+    select_zone(pos_1, pos_2){
+      console.log('select_zone', pos_1, pos_2);
+      let start_x = Math.min(pos_1.x, pos_2.x);
+      let end_x = Math.max(pos_1.x, pos_2.x);
+      let start_y = Math.min(pos_1.y, pos_2.y);
+      let end_y = Math.max(pos_1.y, pos_2.y);
+      for(let x=start_x; x<=end_x; x++){
+        for(let y=start_y; y<=end_y; y++){
+          console.log(x,y);
+          let entities = this.room.world.entities.filter(e=> e.pos.x==x && e.pos.y==y && e.owner==this.player_id);
+          entities.forEach(e=>{
+            if(!this.selection.includes(e.id)){
+              this.selection.push(e.id);
+            }
+          });
+        }
+      }
     },
     unselect(){
       if(!this.selection) return;

@@ -16,7 +16,6 @@
   <!--
   <script src="js/lib/vue.js"></script>
   -->
-  
   <script type="importmap">
   {
     "imports": {
@@ -24,6 +23,7 @@
       "socket": "./js/socket.js",
       "components": "./js/components.js",
       "svg-components": "./js/svg-components.js",
+      "map-components": "./js/map-components.js",
       "app": "./js/app.js"
     }
   }
@@ -87,7 +87,8 @@
           ></selection>
           
           <creations
-            :creations="creations"
+            :selected_types=selected_types
+            :gold=10
             @creation=creation
           ></creations>
           
@@ -123,6 +124,7 @@
         @inspect=inspect
         @select=select
         @select_add=select_add
+        @select_zone=select_zone
         @target=target
       ></main-map>
 

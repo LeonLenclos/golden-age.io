@@ -14,6 +14,7 @@ import { New, Kill } from './events.js';
 
 import {find_nearest_path} from './path.js';
 
+
 export class Entity {
 
   static type = 'entity';
@@ -232,7 +233,7 @@ export class House extends Building {
   static type = 'house';
   static hp = 10;
   static cost = 20;
-
+  
   constructor(pos, owner){
     super(pos, owner);
     this.actions = [Create];
@@ -249,4 +250,16 @@ export class Factory extends Building {
   constructor(pos, owner){
     super(pos, owner);
   }
+  
 }
+
+
+export let available_entities = [House, Factory, Unit];
+
+export let available_entities_data = available_entities.map(a=>{
+      return{
+        type:a.type,
+        cost:a.cost,
+        hp:a.hp,
+        create_by:available_entities.filter(e=>{let ee = new e(); return ee.creations.includes(a)}).map(e=>e.type),
+      };});

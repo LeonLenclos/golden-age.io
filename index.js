@@ -7,6 +7,7 @@ import {rooms, history, get_private_room, get_public_room, get_room_by_id} from 
 import {players, new_player, remove_player, get_player} from './engine/player.js';
 import {new_vector as V} from './engine/vector.js';
 import {execute_cheat_codes, list_cheat_codes} from './engine/cheat.js';
+import {available_entities_data} from './engine/entity.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -25,7 +26,7 @@ import package_json from './package.json' with { type: "json" };
 app.use(express.static('./public'));
 app.get('/assets.json', (req, res) => res.send(assets_tree));
 app.get('/about.json', (req, res) => res.send({version:package_json.version}));
-
+app.get('/available_entities.json', (req, res) => res.send(available_entities_data));
 app.get('/cheatcodes.json', (req, res) => res.send(list_cheat_codes()));
 app.get('/stat.json', (req, res) => res.send({rooms:rooms.length, players:players.length}));
 app.get('/history.json', (req, res) => {
@@ -56,7 +57,11 @@ io.on('connection', (socket) => {
 
   socket.on('join', (data) => {
     let room;
-    if(data.room){
+    if(data.room && data.room == 'test'){
+        room = get_private_room(io);
+        room.add_bot('easy');
+    }
+    else if(data.room){
       room = get_room_by_id(data.room, io);
       if(!room) {
         socket.emit('room_not_found', data.room);
@@ -136,6 +141,6 @@ io.on('connection', (socket) => {
 });
 
 
-server.listen(3000, () => {
+server.listen(3003, () => {
   console.log('listening on *:3000');
 });

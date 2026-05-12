@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import { app } from 'app';
 import * as components from 'components';
 import * as svg_components from 'svg-components';
+import * as map_components from 'map-components';
 
 
 
@@ -25,8 +26,12 @@ main_app.component('loading', components.loading);
 main_app.component('start', components.start);
 main_app.component('end', components.end);
 main_app.component('waiting', components.waiting);
-main_app.component('main-map', components.main_map);
-main_app.component('cell', components.cell);
+// map-components
+main_app.component('main-map', map_components.main_map);
+main_app.component('canvas-map', map_components.canvas_map);
+
+
+main_app.component('cell', map_components.cell);
 // svg-components
 main_app.component('entity', svg_components.entity);
 main_app.component('event', svg_components.event);
